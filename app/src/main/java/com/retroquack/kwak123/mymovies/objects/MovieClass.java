@@ -3,7 +3,7 @@ package com.retroquack.kwak123.mymovies.objects;
 import android.os.Parcel;
 import android.os.Parcelable;
 
-import com.retroquack.kwak123.mymovies.data.UrlTool;
+import com.retroquack.kwak123.mymovies.network.UrlTool;
 
 /**
  * Custom MovieClass that holds the data I want from the JSON object.

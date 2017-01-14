@@ -1,9 +1,7 @@
 package com.retroquack.kwak123.mymovies;
 
 import android.app.Fragment;
-import android.content.Loader;
 import android.os.Bundle;
-import android.app.LoaderManager;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -12,12 +10,8 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.retroquack.kwak123.mymovies.objects.MovieClass;
-import com.retroquack.kwak123.mymovies.objects.ReviewClass;
-import com.retroquack.kwak123.mymovies.objects.TrailerClass;
 import com.squareup.picasso.Callback;
 import com.squareup.picasso.Picasso;
-
-import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -26,17 +20,14 @@ import butterknife.Unbinder;
 /**
  * This is the screen for holding the user's interactions.
  * I apologize for the layout being incomplete, I am still learning better layout practices
+ *
+ * TODO: Replace Trailer/REview adapter with correct ExpandableListAdapter+6+
  */
 
 public class DetailsFragment extends Fragment {
 
     private static final String LOG_TAG = DetailsFragment.class.getSimpleName();
     private Unbinder unbinder;
-
-    private static final int TRAILER_LOADER = 0;
-    private static final int REVIEW_LOADER = 1;
-
-    private String movieId;
 
     @BindView(R.id.poster_detail_view) ImageView posterView;
     @BindView(R.id.backdrop_view) ImageView backdropView;
@@ -101,16 +92,20 @@ public class DetailsFragment extends Fragment {
         super.onDestroyView();
         unbinder.unbind();
     }
-
+/*
     private LoaderManager.LoaderCallbacks<List<TrailerClass>> trailerResultsLoader = new LoaderManager.LoaderCallbacks<List<TrailerClass>>() {
         @Override
         public Loader<List<TrailerClass>> onCreateLoader(int id, Bundle args) {
-            return null;
+            return new TrailerLoader(getActivity(), mMovieId);
         }
 
         @Override
         public void onLoadFinished(Loader<List<TrailerClass>> loader, List<TrailerClass> data) {
+            mTrailerAdapter.clear();
 
+            if (data != null && !data.isEmpty()) {
+                mTrailerAdapter.addAll(data);
+            }
         }
 
         @Override
@@ -119,20 +114,5 @@ public class DetailsFragment extends Fragment {
         }
     };
 
-    private LoaderManager.LoaderCallbacks<List<ReviewClass>> reviewResultsLoader = new LoaderManager.LoaderCallbacks<List<ReviewClass>>() {
-        @Override
-        public Loader<List<ReviewClass>> onCreateLoader(int id, Bundle args) {
-            return null;
-        }
-
-        @Override
-        public void onLoadFinished(Loader<List<ReviewClass>> loader, List<ReviewClass> data) {
-
-        }
-
-        @Override
-        public void onLoaderReset(Loader<List<ReviewClass>> loader) {
-
-        }
-    };
+*/
 }

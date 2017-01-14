@@ -20,8 +20,8 @@ import android.widget.GridView;
 import android.widget.Spinner;
 
 import com.retroquack.kwak123.mymovies.adapters.MovieAdapter;
-import com.retroquack.kwak123.mymovies.data.MovieLoader;
-import com.retroquack.kwak123.mymovies.data.UrlTool;
+import com.retroquack.kwak123.mymovies.network.MovieLoader;
+import com.retroquack.kwak123.mymovies.network.UrlTool;
 import com.retroquack.kwak123.mymovies.objects.MovieClass;
 
 import java.util.ArrayList;
@@ -161,7 +161,6 @@ public class MainFragment extends Fragment implements LoaderManager.LoaderCallba
     private void startLoader(int id) {
         getLoaderManager().initLoader(id, null, this);
     }
-
     /**
      * Loader methods are listed below.
      */

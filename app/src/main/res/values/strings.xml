@@ -15,4 +15,6 @@
     <string name="about_detail">This app was made for Project 1 of the Udacity Developer Nanodegree course. Much of this code was taken directly from previous Udacity code and refactored to fit this project. Thanks for reviewing!</string>
     <string name="tmdb_attribution">This product uses the TMDb API but is not endorsed or certified by TMDb.</string>
 
+    <!-- Details strings -->
+    <string name="no_connection_string">Sorry, we couldn\'t load these results. Are you connected to the internet?</string>
 </resources>

@@ -4,87 +4,111 @@
     android:layout_height="match_parent"
     android:orientation="vertical">
 
-    <LinearLayout
+    <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:orientation="vertical">
+        android:layout_height="match_parent">
 
-        <ImageView
-            android:id="@+id/backdrop_view"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:scaleType="fitStart"
-            android:adjustViewBounds="true"/>
-
-        <ProgressBar
-            android:id="@+id/detail_progress_bar"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            style="@style/Widget.AppCompat.ProgressBar"/>
 
         <LinearLayout
-            android:id="@+id/layout_top"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal">
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical">
 
             <ImageView
-                android:id="@+id/poster_detail_view"
-                android:layout_width="wrap_content"
+                android:id="@+id/backdrop_view"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_margin="@dimen/activity_horizontal_margin"
                 android:scaleType="fitStart"
-                android:adjustViewBounds="true"
-                android:focusable="false"
-                android:clickable="false"
-                android:transitionName="poster"/>
+                android:adjustViewBounds="true"/>
+
+            <ProgressBar
+                android:id="@+id/detail_progress_bar"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                style="@style/Widget.AppCompat.ProgressBar"/>
 
             <LinearLayout
-                android:id="@+id/movie_details_layout"
+                android:id="@+id/layout_top"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:orientation="vertical">
+                android:orientation="horizontal">
 
-                <TextView
-                    android:id="@+id/movie_title"
+                <ImageView
+                    android:id="@+id/poster_detail_view"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="@dimen/activity_vertical_margin"
-                    android:textAppearance="?android:textAppearanceMedium"
-                    android:textColor="@android:color/black"/>
+                    android:layout_margin="@dimen/activity_horizontal_margin"
+                    android:scaleType="fitStart"
+                    android:adjustViewBounds="true"
+                    android:focusable="false"
+                    android:clickable="false"
+                    android:transitionName="poster"/>
 
-                <TextView
-                    android:id="@+id/movie_rating"
+                <LinearLayout
+                    android:id="@+id/movie_details_layout"
                     android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"/>
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical">
 
-                <TextView
-                    android:id="@+id/movie_release"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"/>
+                    <TextView
+                        android:id="@+id/movie_title"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="@dimen/activity_vertical_margin"
+                        android:textAppearance="?android:textAppearanceMedium"
+                        android:textColor="@android:color/black"/>
+
+                    <TextView
+                        android:id="@+id/movie_rating"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"/>
+
+                    <TextView
+                        android:id="@+id/movie_release"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"/>
+
+                </LinearLayout>
 
             </LinearLayout>
 
+            <TextView
+                android:id="@+id/movie_overview"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="@dimen/activity_horizontal_margin"
+                android:layout_marginRight="@dimen/activity_horizontal_margin"
+                android:layout_marginBottom="@dimen/activity_vertical_margin"/>
+
         </LinearLayout>
 
+        <ListView
+            android:id="@+id/trailer_list_view"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+        </ListView>
+
         <TextView
-            android:id="@+id/movie_overview"
+            android:id="@+id/empty_trailer"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginLeft="@dimen/activity_horizontal_margin"
-            android:layout_marginRight="@dimen/activity_horizontal_margin"
-            android:layout_marginBottom="@dimen/activity_vertical_margin"/>
+            android:minHeight="?android:listPreferredItemHeight"
+            android:text="@string/no_connection_string"/>
 
-    </LinearLayout>
+        <ListView
+            android:id="@+id/review_list_view"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+        </ListView>
 
-    <ListView
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content">
-    </ListView>
+        <TextView
+            android:id="@+id/empty_review"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:minHeight="?android:listPreferredItemHeight"
+            android:text="@string/no_connection_string"/>
 
-    <ListView
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content">
-    </ListView>
+    </RelativeLayout>
 
 </ScrollView>
+
