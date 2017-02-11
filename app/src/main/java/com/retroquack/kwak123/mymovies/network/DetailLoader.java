@@ -2,34 +2,33 @@ package com.retroquack.kwak123.mymovies.network;
 
 import android.content.AsyncTaskLoader;
 import android.content.Context;
+import android.util.Log;
 
-import com.retroquack.kwak123.mymovies.objects.DetailClass;
+import com.retroquack.kwak123.mymovies.model.DetailClass;
 
+import java.util.HashMap;
 import java.util.List;
 
 /**
  * Created by kwak123 on 12/17/2016.
  */
 
-public class DetailLoader extends AsyncTaskLoader<List<DetailClass>> {
+public class DetailLoader extends AsyncTaskLoader<HashMap<String, List<DetailClass>>> {
 
     private static final String LOG_TAG = DetailLoader.class.getSimpleName();
 
     private String mMovieId;
-    private List<DetailClass> mData;
-    private int mLoaderType;
+    private HashMap<String, List<DetailClass>> mData;
 
     /**
-     * This is the Loader hook, TODO: Finish this doucmentation
+     * This is the Loader hook, TODO: Finish this documentation
      *
      * @param context
      * @param movieId
-     * @param loaderType use the static ints in DetailQuery to properly identify what you wish to load
      */
-    public DetailLoader(Context context, String movieId, int loaderType) {
+    public DetailLoader(Context context, String movieId) {
         super(context);
         mMovieId = movieId;
-        mLoaderType = loaderType;
     }
 
     @Override
@@ -43,24 +42,25 @@ public class DetailLoader extends AsyncTaskLoader<List<DetailClass>> {
     }
 
     @Override
-    public List<DetailClass> loadInBackground() {
-        if (mMovieId.isEmpty() || mMovieId == null) {
-            return null;
-        }
+    public HashMap<String, List<DetailClass>> loadInBackground() {
 
-        mData = DetailQuery.getDetailData(mMovieId, mLoaderType);
+        mData = DetailQuery.getDetailData(mMovieId);
+        Log.v(LOG_TAG, "Loading hashmap now");
+        if (mData.isEmpty()) {
+            Log.v(LOG_TAG, "hashmap is null?");
+        }
         return mData;
     }
 
     // Passes back data to the loader if it already exists, so an additional network call is not made
     @Override
-    public void deliverResult(List<DetailClass> data) {
+    public void deliverResult(HashMap<String, List<DetailClass>> data) {
         if (isReset()) {
             onReleaseResources(data);
             return;
         }
 
-        List<DetailClass> oldData = mData;
+        HashMap<String, List<DetailClass>> oldData = mData;
         mData = data;
 
         if (isStarted()) {
@@ -72,5 +72,5 @@ public class DetailLoader extends AsyncTaskLoader<List<DetailClass>> {
         }
     }
 
-    private void onReleaseResources(List<DetailClass> data) {}
+    private void onReleaseResources(HashMap<String, List<DetailClass>> data) {}
 }

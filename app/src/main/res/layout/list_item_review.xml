@@ -1,19 +1,39 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-              android:layout_width="match_parent"
-              android:layout_height="wrap_content"
-              android:minHeight="?android:attr/listPreferredItemHeight">
+
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/review_base_layout"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:minHeight="?android:attr/listPreferredItemHeight">
+
+    <FrameLayout
+        android:id="@+id/review_image_layout"
+        android:layout_width="64dp"
+        android:layout_height="wrap_content"
+        android:layout_centerVertical="true">
+
+        <ImageView
+            android:src="@mipmap/tmdb_logo"
+            android:id="@+id/review_image_view"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"/>
+
+    </FrameLayout>
 
     <LinearLayout
-        android:id="@+id/review_layout"
+        android:id="@+id/review_detail_layout"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_toEndOf="@id/review_image_layout"
         android:orientation="vertical"
-        android:padding="@dimen/activity_horizontal_margin">
+        android:padding="@dimen/activity_horizontal_margin"
+        android:paddingStart="0dp">
 
         <TextView
             android:text="TESTER"
-            android:id="@+id/result_author_view"
+            android:id="@+id/review_author_view"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:textSize="16sp"
@@ -21,7 +41,7 @@
 
         <TextView
             android:text="THIS IS A TESTER SUMMARY"
-            android:id="@+id/result_summary_view"
+            android:id="@+id/review_summary_view"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:textSize="14sp"
@@ -30,6 +50,7 @@
     </LinearLayout>
 
     <ImageView
+        android:id="@+id/review_right_arrow"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:src="@mipmap/ic_chevron_right"

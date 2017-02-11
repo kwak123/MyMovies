@@ -6,7 +6,7 @@
 
     <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="wrap_content">
 
 
         <LinearLayout
@@ -80,33 +80,11 @@
                 android:layout_marginRight="@dimen/activity_horizontal_margin"
                 android:layout_marginBottom="@dimen/activity_vertical_margin"/>
 
+            <include layout="@layout/container_trailer"/>
+
+            <include layout="@layout/container_reviews"/>
+
         </LinearLayout>
-
-        <ListView
-            android:id="@+id/trailer_list_view"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content">
-        </ListView>
-
-        <TextView
-            android:id="@+id/empty_trailer"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:minHeight="?android:listPreferredItemHeight"
-            android:text="@string/no_connection_string"/>
-
-        <ListView
-            android:id="@+id/review_list_view"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content">
-        </ListView>
-
-        <TextView
-            android:id="@+id/empty_review"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:minHeight="?android:listPreferredItemHeight"
-            android:text="@string/no_connection_string"/>
 
     </RelativeLayout>
 

@@ -3,7 +3,7 @@ package com.retroquack.kwak123.mymovies.network;
 import android.content.AsyncTaskLoader;
 import android.content.Context;
 
-import com.retroquack.kwak123.mymovies.objects.MovieClass;
+import com.retroquack.kwak123.mymovies.model.MovieClass;
 
 import java.util.List;
 

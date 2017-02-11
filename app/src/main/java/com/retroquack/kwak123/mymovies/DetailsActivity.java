@@ -4,7 +4,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 
-import com.retroquack.kwak123.mymovies.objects.MovieClass;
+import com.retroquack.kwak123.mymovies.model.MovieClass;
 
 public class DetailsActivity extends AppCompatActivity {
 

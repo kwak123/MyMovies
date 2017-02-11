@@ -3,7 +3,7 @@ package com.retroquack.kwak123.mymovies.network;
 import android.text.TextUtils;
 import android.util.Log;
 
-import com.retroquack.kwak123.mymovies.objects.MovieClass;
+import com.retroquack.kwak123.mymovies.model.MovieClass;
 
 import org.json.JSONArray;
 import org.json.JSONException;

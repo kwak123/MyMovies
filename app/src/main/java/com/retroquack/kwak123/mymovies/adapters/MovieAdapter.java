@@ -8,7 +8,7 @@ import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 
-import com.retroquack.kwak123.mymovies.objects.MovieClass;
+import com.retroquack.kwak123.mymovies.model.MovieClass;
 import com.retroquack.kwak123.mymovies.R;
 import com.squareup.picasso.Callback;
 import com.squareup.picasso.Picasso;

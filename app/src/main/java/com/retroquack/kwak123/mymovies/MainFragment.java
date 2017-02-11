@@ -21,8 +21,8 @@ import android.widget.Spinner;
 
 import com.retroquack.kwak123.mymovies.adapters.MovieAdapter;
 import com.retroquack.kwak123.mymovies.network.MovieLoader;
-import com.retroquack.kwak123.mymovies.network.UrlTool;
-import com.retroquack.kwak123.mymovies.objects.MovieClass;
+import com.retroquack.kwak123.mymovies.tools.UrlTool;
+import com.retroquack.kwak123.mymovies.model.MovieClass;
 
 import java.util.ArrayList;
 import java.util.List;
