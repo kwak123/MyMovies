@@ -13,13 +13,11 @@ import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
-import com.bumptech.glide.Glide;
-import com.retroquack.kwak123.mymovies.network.DetailLoader;
-import com.retroquack.kwak123.mymovies.network.DetailQuery;
 import com.retroquack.kwak123.mymovies.model.DetailClass;
 import com.retroquack.kwak123.mymovies.model.MovieClass;
+import com.retroquack.kwak123.mymovies.network.DetailLoader;
+import com.retroquack.kwak123.mymovies.network.DetailQuery;
 import com.retroquack.kwak123.mymovies.presenter.DetailsPresenterImpl;
-import com.retroquack.kwak123.mymovies.presenter.DetailsView;
 import com.squareup.picasso.Callback;
 import com.squareup.picasso.Picasso;
 
@@ -38,7 +36,7 @@ import butterknife.Unbinder;
  */
 
 public class DetailsFragment extends Fragment implements
-        LoaderManager.LoaderCallbacks<HashMap<String, List<DetailClass>>>, DetailsView {
+        LoaderManager.LoaderCallbacks<HashMap<String, List<DetailClass>>> {
 
     private static final String LOG_TAG = DetailsFragment.class.getSimpleName();
     private Unbinder unbinder;
@@ -78,8 +76,7 @@ public class DetailsFragment extends Fragment implements
 
         Bundle bundle = getArguments();
         MovieClass mMovieClass = bundle.getParcelable(MovieClass.CLASS_KEY);
-        mPresenter = new DetailsPresenterImpl(this);
-
+        mPresenter = new DetailsPresenterImpl(getActivity());
 
         unbinder = ButterKnife.bind(this, rootView);
 
@@ -148,12 +145,6 @@ public class DetailsFragment extends Fragment implements
         mData = null;
     }
 
-    @Override
-    public void onDetailsLoaded() {
-        mPresenter.onTrailerSelected(mTrailersList);
-        mPresenter.onReviewSelected(mReviewsList);
-    }
-
     private void updateTrailers(List<DetailClass> trailersList) {
 
         Log.v(LOG_TAG, "Updating trailers!");
@@ -175,6 +166,13 @@ public class DetailsFragment extends Fragment implements
                         .load(trailer.getTrailerStillUrl())
                         .into(trailerStillView);
 
+                trailerView.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        mPresenter.onTrailerSelected((DetailClass) trailerView.getTag());
+                    }
+                });
+
                 if (trailerView.getParent() != null) {
                     ((ViewGroup) trailerView.getParent()).removeView(trailerView);
                 }
@@ -193,6 +191,13 @@ public class DetailsFragment extends Fragment implements
             trailerTitleView.setText(DetailClass.NO_TRAILER);
             trailerStillView.setImageResource(R.mipmap.no_pic);
             trailerView.setTag(noTrailerClass);
+
+            trailerView.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    mPresenter.noTrailerAvailable();
+                }
+            });
 
             if (trailerView.getParent() != null) {
                 ((ViewGroup) trailerView.getParent()).removeView(trailerView);
@@ -218,6 +223,13 @@ public class DetailsFragment extends Fragment implements
                 reviewSummaryView.setText(review.getReviewTruncatedSummary());
                 reviewView.setTag(review);
 
+                reviewView.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        mPresenter.onReviewSelected((DetailClass) reviewView.getTag());
+                    }
+                });
+
                 if (reviewView.getParent() != null) {
                     ((ViewGroup) reviewView.getParent()).removeView(reviewView);
                 }
@@ -235,6 +247,13 @@ public class DetailsFragment extends Fragment implements
             DetailClass noReviewFound = DetailClass.noReviewFound();
 
             reviewView.setTag(noReviewFound);
+
+            reviewView.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    mPresenter.noReviewAvailable();
+                }
+            });
 
             if (reviewView.getParent() != null) {
                 ((ViewGroup) reviewView.getParent()).removeView(reviewView);

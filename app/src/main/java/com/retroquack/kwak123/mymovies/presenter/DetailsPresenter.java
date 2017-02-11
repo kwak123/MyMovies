@@ -2,16 +2,21 @@ package com.retroquack.kwak123.mymovies.presenter;
 
 import com.retroquack.kwak123.mymovies.model.DetailClass;
 
-import java.util.List;
-
 /**
  * Created by kwak123 on 2/5/2017.
+ *
+ * Contract for the presenter to follow
+ * Used MVP for testing purpose
  */
 
-public interface DetailsPresenter {
+interface DetailsPresenter {
 
-    void onTrailerSelected(List<DetailClass> trailerList);
+    void onTrailerSelected(DetailClass trailer);
 
-    void onReviewSelected(List<DetailClass> reviewsList);
+    void onReviewSelected(DetailClass review);
+
+    void noTrailerAvailable();
+
+    void noReviewAvailable();
 
 }
