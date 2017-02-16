@@ -5,12 +5,17 @@ import android.os.Parcelable;
 
 import com.retroquack.kwak123.mymovies.tools.UrlTool;
 
+import io.realm.RealmObject;
+import io.realm.annotations.PrimaryKey;
+
 /**
  * Custom MovieClass that holds the data I want from the JSON object.
  * I wanted to store everything as Strings just to keep the data simpler
  */
 
 public class MovieClass implements Parcelable {
+
+    private String mId;
     private String mPosterUrl;
     private String mBackdropUrl;
     private String mTitle;
@@ -18,7 +23,6 @@ public class MovieClass implements Parcelable {
     private String mPopular;
     private String mRelease;
     private String mOverview;
-    private String mId;
 
     // For use when parceling an instance of the object
     public static final String CLASS_KEY = "movieClass";
@@ -107,10 +111,12 @@ public class MovieClass implements Parcelable {
         return mId;
     }
 
+    // Only the year
     private String formatDate(String input) {
         return input.substring(0, 4);
     }
 
+    // Make it obvious that the scale is out of 10
     private String formatRating(String input) {
         return input + "/10";
     }

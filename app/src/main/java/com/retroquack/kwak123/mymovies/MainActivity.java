@@ -7,6 +7,11 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.Toast;
 
+import com.retroquack.kwak123.mymovies.presenter.MainPresenterImpl;
+
+import io.realm.Realm;
+import io.realm.RealmConfiguration;
+
 /**
  * Holds the main fragment as well as the options menu for the main page.
  */
@@ -16,6 +21,10 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        Realm.init(this);
+        Realm realm = Realm.getDefaultInstance();
+
         setContentView(R.layout.activity_main);
 
         if (savedInstanceState == null) {

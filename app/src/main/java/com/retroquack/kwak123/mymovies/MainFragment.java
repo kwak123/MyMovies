@@ -4,6 +4,7 @@ import android.app.Fragment;
 import android.app.LoaderManager;
 import android.content.Intent;
 import android.content.Loader;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.support.v4.view.MenuItemCompat;
 import android.text.TextUtils;
@@ -21,11 +22,13 @@ import android.widget.Spinner;
 
 import com.retroquack.kwak123.mymovies.adapters.MovieAdapter;
 import com.retroquack.kwak123.mymovies.network.MovieLoader;
+import com.retroquack.kwak123.mymovies.presenter.MainPresenterImpl;
 import com.retroquack.kwak123.mymovies.tools.UrlTool;
 import com.retroquack.kwak123.mymovies.model.MovieClass;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 
 public class MainFragment extends Fragment implements LoaderManager.LoaderCallbacks<List<MovieClass>>{
 
@@ -41,6 +44,7 @@ public class MainFragment extends Fragment implements LoaderManager.LoaderCallba
     private Spinner mSpinner;
     private int spinnerPos;
     private int loaderStored;
+    private MainPresenterImpl mPresenter;
 
     // Required empty public constructor
     public MainFragment() {}
@@ -49,6 +53,8 @@ public class MainFragment extends Fragment implements LoaderManager.LoaderCallba
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setHasOptionsMenu(true);
+
+        mPresenter = new MainPresenterImpl(getActivity());
 
         if (savedInstanceState != null) {
             spinnerPos = savedInstanceState.getInt(SPINNER_KEY);
@@ -114,14 +120,7 @@ public class MainFragment extends Fragment implements LoaderManager.LoaderCallba
         @Override
         public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
             MovieClass movieClass = mAdapter.getItem(position);
-
-            if (movieClass != null) {
-                Intent intent = new Intent(getActivity(), DetailsActivity.class);
-                intent.putExtra(MovieClass.CLASS_KEY, movieClass);
-                startActivity(intent);
-            } else {
-                Log.e(LOG_TAG, "No movie object was found?");
-            }
+            mPresenter.onMovieClicked(movieClass);
         }
     };
 
@@ -190,5 +189,4 @@ public class MainFragment extends Fragment implements LoaderManager.LoaderCallba
     public void onLoaderReset(Loader<List<MovieClass>> loader) {
         mAdapter.clear();
     }
-
 }

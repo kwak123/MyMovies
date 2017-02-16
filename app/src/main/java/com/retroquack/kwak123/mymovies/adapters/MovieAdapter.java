@@ -1,6 +1,7 @@
 package com.retroquack.kwak123.mymovies.adapters;
 
 import android.content.Context;
+import android.support.annotation.NonNull;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -8,8 +9,8 @@ import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 
-import com.retroquack.kwak123.mymovies.model.MovieClass;
 import com.retroquack.kwak123.mymovies.R;
+import com.retroquack.kwak123.mymovies.model.MovieClass;
 import com.squareup.picasso.Callback;
 import com.squareup.picasso.Picasso;
 
@@ -33,16 +34,14 @@ public class MovieAdapter extends ArrayAdapter<MovieClass> {
         super(context, 0, movieClasses);
     }
 
-
-
     @Override
+    @NonNull
     public View getView(int position, View convertView, ViewGroup parent) {
 
         ViewHolder holder;
 
         if (convertView != null) {
             holder = (ViewHolder) convertView.getTag();
-            holder.progressBar.setVisibility(View.VISIBLE);
         } else {
             convertView = LayoutInflater.from(getContext())
                     .inflate(R.layout.grid_layout_item, parent, false);
@@ -50,32 +49,21 @@ public class MovieAdapter extends ArrayAdapter<MovieClass> {
             convertView.setTag(holder);
         }
 
-        final ProgressBar progressBar = holder.progressBar;
-
         final MovieClass movie = getItem(position);
 
         // ImageView loading for movie posters on the main fragment
 
         Picasso.with(getContext())
                 .load(movie.getPosterUrl())
-                .into(holder.posterView, new Callback() {
-                    @Override
-                    public void onSuccess() {
-                        progressBar.setVisibility(View.GONE);
-                    }
-
-                    @Override
-                    public void onError() {}
-                });
+                .into(holder.posterView);
 
         return convertView;
     }
 
     static class ViewHolder {
-        @BindView(R.id.progress_bar) ProgressBar progressBar;
         @BindView(R.id.poster_view) ImageView posterView;
 
-        public ViewHolder(View view) {
+        ViewHolder(View view) {
             ButterKnife.bind(this, view);
         }
     }

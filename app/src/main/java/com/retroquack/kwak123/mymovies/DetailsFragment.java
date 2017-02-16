@@ -4,15 +4,16 @@ import android.app.Fragment;
 import android.app.LoaderManager;
 import android.content.Loader;
 import android.os.Bundle;
+import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
-import android.widget.ProgressBar;
 import android.widget.TextView;
 
+import com.bumptech.glide.Glide;
 import com.retroquack.kwak123.mymovies.model.DetailClass;
 import com.retroquack.kwak123.mymovies.model.MovieClass;
 import com.retroquack.kwak123.mymovies.network.DetailLoader;
@@ -30,22 +31,26 @@ import butterknife.Unbinder;
 
 /**
  * This is the screen for holding the user's interactions.
- * I apologize for the layout being incomplete, I am still learning better layout practices
+ * No lambdas because I didn't want to lose Instant Run.
  *
- * TODO: Replace Trailer/Review adapter with correct ExpandableListAdapter
+ * TODO: Add favorites option
+ * TODO: Add menu button to see other favorites, etc.
  */
 
 public class DetailsFragment extends Fragment implements
         LoaderManager.LoaderCallbacks<HashMap<String, List<DetailClass>>> {
 
     private static final String LOG_TAG = DetailsFragment.class.getSimpleName();
+
+    private DisplayMetrics mDisplayMetrics;
+
     private Unbinder unbinder;
     private String mMovieId;
     private DetailsPresenterImpl mPresenter;
 
+    private MovieClass mMovieClass;
+
     private HashMap<String, List<DetailClass>> mData;
-    private List<DetailClass> mTrailersList;
-    private List<DetailClass> mReviewsList;
 
     @BindView(R.id.poster_detail_view) ImageView posterView;
     @BindView(R.id.backdrop_view) ImageView backdropView;
@@ -68,19 +73,24 @@ public class DetailsFragment extends Fragment implements
     }
 
 
-    // View creation, mostly done dynamically so that changing XML components will not
-    // break the fragment, as long as IDs are retained
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        Bundle bundle = getArguments();
+        mMovieClass = bundle.getParcelable(MovieClass.CLASS_KEY);
+
+        mDisplayMetrics = new DisplayMetrics();
+    }
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.fragment_detail, container, false);
 
-        Bundle bundle = getArguments();
-        MovieClass mMovieClass = bundle.getParcelable(MovieClass.CLASS_KEY);
+        getActivity().getWindowManager().getDefaultDisplay().getMetrics(mDisplayMetrics);
+
         mPresenter = new DetailsPresenterImpl(getActivity());
 
         unbinder = ButterKnife.bind(this, rootView);
-
-        final ProgressBar progressBar = (ProgressBar) rootView.findViewById(R.id.detail_progress_bar);
 
         mMovieId = mMovieClass.getId();
 
@@ -89,24 +99,16 @@ public class DetailsFragment extends Fragment implements
         releaseView.setText(mMovieClass.getRelease());
         overviewView.setText(mMovieClass.getOverview());
 
+        backdropView.getLayoutParams().height = mDisplayMetrics.widthPixels * 104 / 185;
+        Log.v(LOG_TAG, Integer.toString(mDisplayMetrics.widthPixels * 104 / 185));
+
         Picasso.with(getActivity())
                 .load(mMovieClass.getPosterUrl())
                 .into(posterView);
 
-        Picasso.with(getActivity())
+        Glide.with(getActivity())
                 .load(mMovieClass.getBackdropUrl())
-                .into(backdropView, new Callback() {
-                    @Override
-                    public void onSuccess() {
-                        progressBar.setVisibility(View.GONE);
-                    }
-
-                    @Override
-                    public void onError() {
-                        progressBar.setVisibility(View.GONE);
-                        backdropView.setImageResource(R.mipmap.no_pic);
-                    }
-                });
+                .into(backdropView);
 
         getLoaderManager().initLoader(0, null, this);
 
@@ -133,8 +135,8 @@ public class DetailsFragment extends Fragment implements
 
         mData = data;
 
-        mTrailersList = mData.get(DetailQuery.TRAILER_HEADER);
-        mReviewsList = mData.get(DetailQuery.REVIEW_HEADER);
+        List<DetailClass> mTrailersList = mData.get(DetailQuery.TRAILER_HEADER);
+        List<DetailClass> mReviewsList = mData.get(DetailQuery.REVIEW_HEADER);
 
         updateTrailers(mTrailersList);
         updateReviews(mReviewsList);
@@ -186,7 +188,6 @@ public class DetailsFragment extends Fragment implements
             final ImageView trailerStillView = (ImageView) trailerView.findViewById(R.id.trailer_image_view);
 
             final DetailClass noTrailerClass = DetailClass.noTrailerFound();
-            // I was going to use a lambda here, opted against it to keep it in line with older versions of java
 
             trailerTitleView.setText(DetailClass.NO_TRAILER);
             trailerStillView.setImageResource(R.mipmap.no_pic);

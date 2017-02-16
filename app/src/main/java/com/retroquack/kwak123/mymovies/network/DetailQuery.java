@@ -39,7 +39,7 @@ import static com.retroquack.kwak123.mymovies.model.DetailClass.TYPE_TRAILER;
  *
  * THIS NEEDS TO RETURN A HASHMAP
  *
- * TODO: What if the trailer query and review query are legitimate but return no results? e.g. movie_id 550
+ * TODO: Query started but signal lost?
  */
 
 public class DetailQuery {
@@ -222,11 +222,11 @@ public class DetailQuery {
             return null;
         }
 
-        StringBuilder builder = new StringBuilder();
-        builder.append(summary.substring(0, 40))
-                .append("... ");
+        if (summary.length() < 30) {
+            return summary;
+        }
 
-        return builder.toString();
+        return summary.substring(0, 30) + "...";
     }
 
 }
