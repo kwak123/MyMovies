@@ -7,11 +7,10 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.ImageView;
-import android.widget.ProgressBar;
 
 import com.retroquack.kwak123.mymovies.R;
 import com.retroquack.kwak123.mymovies.model.MovieClass;
-import com.squareup.picasso.Callback;
+import com.retroquack.kwak123.mymovies.tools.UrlTool;
 import com.squareup.picasso.Picasso;
 
 import java.util.List;
@@ -54,10 +53,16 @@ public class MovieAdapter extends ArrayAdapter<MovieClass> {
         // ImageView loading for movie posters on the main fragment
 
         Picasso.with(getContext())
-                .load(movie.getPosterUrl())
+                .load(UrlTool.buildPosterUrl(movie.getPosterKey()).toString())
                 .into(holder.posterView);
 
         return convertView;
+    }
+
+    public void onFavoritesRefresh(List<MovieClass> movieClasses) {
+        clear();
+        addAll(movieClasses);
+        notifyDataSetChanged();
     }
 
     static class ViewHolder {
@@ -67,4 +72,5 @@ public class MovieAdapter extends ArrayAdapter<MovieClass> {
             ButterKnife.bind(this, view);
         }
     }
+
 }

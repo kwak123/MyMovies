@@ -7,7 +7,9 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.Toast;
 
+import com.retroquack.kwak123.mymovies.data.MovieDbHelper;
 import com.retroquack.kwak123.mymovies.presenter.MainPresenterImpl;
+import com.retroquack.kwak123.mymovies.presenter.MovieRepositoryImpl;
 
 import io.realm.Realm;
 import io.realm.RealmConfiguration;
@@ -21,9 +23,6 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
-        Realm.init(this);
-        Realm realm = Realm.getDefaultInstance();
 
         setContentView(R.layout.activity_main);
 
@@ -50,6 +49,9 @@ public class MainActivity extends AppCompatActivity {
                 break;
             case R.id.action_about:
                 showAboutDialog();
+                break;
+            case R.id.action_delete:
+                MovieRepositoryImpl.getInstance().deleteDatabase(this);
                 break;
             default:
                 break;

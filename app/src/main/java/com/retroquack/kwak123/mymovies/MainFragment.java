@@ -2,9 +2,7 @@ package com.retroquack.kwak123.mymovies;
 
 import android.app.Fragment;
 import android.app.LoaderManager;
-import android.content.Intent;
 import android.content.Loader;
-import android.graphics.Color;
 import android.os.Bundle;
 import android.support.v4.view.MenuItemCompat;
 import android.text.TextUtils;
@@ -21,33 +19,41 @@ import android.widget.GridView;
 import android.widget.Spinner;
 
 import com.retroquack.kwak123.mymovies.adapters.MovieAdapter;
-import com.retroquack.kwak123.mymovies.network.MovieLoader;
-import com.retroquack.kwak123.mymovies.presenter.MainPresenterImpl;
-import com.retroquack.kwak123.mymovies.tools.UrlTool;
+import com.retroquack.kwak123.mymovies.loaders.MovieLoader;
 import com.retroquack.kwak123.mymovies.model.MovieClass;
+import com.retroquack.kwak123.mymovies.presenter.MainPresenterImpl;
+import com.retroquack.kwak123.mymovies.presenter.MovieRepositoryImpl;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
-import java.util.Random;
 
-public class MainFragment extends Fragment implements LoaderManager.LoaderCallbacks<List<MovieClass>>{
+/**
+ * TODO: Splash screen, check for internet, set listener to check for changes in favorite db
+ *
+ * Redesign to load a hashmap of movie classes instead of separate lists
+ */
+
+
+public class MainFragment extends Fragment implements LoaderManager.LoaderCallbacks<HashMap<String, List<MovieClass>>> {
 
     // Various tags used throughout the activity, just to help keep things sane
     private static final String LOG_TAG = MainFragment.class.getSimpleName();
-    private static final int POPULAR_LOADER = 0;
-    private static final int RATINGS_LOADER = 1;
+
     private static final String SPINNER_KEY = "spinnerPosition";
-    private static final String LOADER_KEY = "loaderId";
 
     // Instantiating some objects that will be used
     private MovieAdapter mAdapter;
     private Spinner mSpinner;
     private int spinnerPos;
-    private int loaderStored;
+    private int movieType;
     private MainPresenterImpl mPresenter;
 
+    private boolean hasStarted = false;
+
     // Required empty public constructor
-    public MainFragment() {}
+    public MainFragment() {
+    }
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -58,10 +64,10 @@ public class MainFragment extends Fragment implements LoaderManager.LoaderCallba
 
         if (savedInstanceState != null) {
             spinnerPos = savedInstanceState.getInt(SPINNER_KEY);
-            loaderStored = savedInstanceState.getInt(LOADER_KEY);
+            movieType = spinnerPos;
+        } else {
+            movieType = MovieRepositoryImpl.TYPE_POPULAR;
         }
-
-        Log.v(LOG_TAG, "Fragment made");
     }
 
     // This adds a Spinner to the action bar
@@ -78,9 +84,20 @@ public class MainFragment extends Fragment implements LoaderManager.LoaderCallba
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
         if (id == R.id.refresh) {
-            getLoaderManager().initLoader(loaderStored, null, this).forceLoad();
+            getLoaderManager().initLoader(0, null, this).forceLoad();
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        if (hasStarted) {
+            Log.v(LOG_TAG, "on resume");
+            mPresenter.onResume();
+            mAdapter.onFavoritesRefresh(mPresenter.onMoviesRequested(movieType));
+        }
+        hasStarted = true;
     }
 
     @Override
@@ -91,27 +108,19 @@ public class MainFragment extends Fragment implements LoaderManager.LoaderCallba
 
         //Loading GridView and GridAdapter
         GridView mMovieGridView = (GridView) rootView.findViewById(R.id.grid_view);
+
         mAdapter = new MovieAdapter(getActivity(), new ArrayList<MovieClass>());
         mMovieGridView.setAdapter(mAdapter);
-
         mMovieGridView.setOnItemClickListener(mOnClickListener);
 
         return rootView;
     }
 
-    // I was playing around with the fragment lifecycle, I left this here as I know I'll be using it later
-    @Override
-    public void onStart() {
-        super.onStart();
-    }
-
-    // Attempt to preserve the current state of the user's choices, so I can call it back when the
-    // fragment is called back
+    // Store current state of the user's choices
     @Override
     public void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
         outState.putInt(SPINNER_KEY, mSpinner.getSelectedItemPosition());
-        outState.putInt(LOADER_KEY, loaderStored);
     }
 
     // Custom listener for the GridView, stores the MovieClass associated with the selected object and
@@ -119,8 +128,8 @@ public class MainFragment extends Fragment implements LoaderManager.LoaderCallba
     private AdapterView.OnItemClickListener mOnClickListener = new AdapterView.OnItemClickListener() {
         @Override
         public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-            MovieClass movieClass = mAdapter.getItem(position);
-            mPresenter.onMovieClicked(movieClass);
+//            MovieClass movieClass = mAdapter.getItem(position);
+            mPresenter.onMovieClicked(movieType, position);
         }
     };
 
@@ -136,17 +145,22 @@ public class MainFragment extends Fragment implements LoaderManager.LoaderCallba
      * This is the custom listener for what the user selects. I chose to save the user's selection
      * into loaderStored so I could call it back when the fragment is paused/resumed
      */
+
     private AdapterView.OnItemSelectedListener mSelectListener = new AdapterView.OnItemSelectedListener() {
         @Override
         public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
             String sel = (String) parent.getItemAtPosition(position);
             if (!TextUtils.isEmpty(sel)) {
                 if (sel.equals(getString(R.string.pref_popular))) {
-                    loaderStored = POPULAR_LOADER;
-                    startLoader(loaderStored);
+                    movieType = MovieRepositoryImpl.TYPE_POPULAR;
+                    startLoader();
+                } else if (sel.equals(getString(R.string.pref_rating))) {
+                    movieType = MovieRepositoryImpl.TYPE_RATING;
+                    startLoader();
                 } else {
-                    loaderStored = RATINGS_LOADER;
-                    startLoader(loaderStored);
+                    movieType = MovieRepositoryImpl.TYPE_FAVORITE;
+                    mAdapter.clear();
+                    mAdapter.addAll(mPresenter.onMoviesRequested(movieType));
                 }
             }
         }
@@ -156,37 +170,29 @@ public class MainFragment extends Fragment implements LoaderManager.LoaderCallba
         }
     };
 
-    // Private method to start the loader, just for my own sanity
-    private void startLoader(int id) {
-        getLoaderManager().initLoader(id, null, this);
+    // Private method to start the loader
+    private void startLoader() {
+        getLoaderManager().initLoader(0, null, this);
     }
+
     /**
      * Loader methods are listed below.
      */
     @Override
-    public Loader<List<MovieClass>> onCreateLoader(int id, Bundle args) {
-        //Log.v(LOG_TAG, "Loader is created");
-        if (id == POPULAR_LOADER) {
-            return new MovieLoader(getActivity(), UrlTool.buildPopularUrl().toString());
-        } else if (id == RATINGS_LOADER) {
-            return new MovieLoader(getActivity(), UrlTool.buildRatingUrl().toString());
-        } else {
-            Log.e(LOG_TAG, "Error with query type?" + id);
-            return null;
-        }
+    public Loader<HashMap<String, List<MovieClass>>> onCreateLoader(int id, Bundle args) {
+        return new MovieLoader(getActivity());
     }
 
-    public void onLoadFinished(Loader<List<MovieClass>> loader, List<MovieClass> data) {
+    public void onLoadFinished(Loader<HashMap<String, List<MovieClass>>> loader, HashMap<String, List<MovieClass>> data) {
         mAdapter.clear();
 
-        if (data != null && !data.isEmpty()) {
-            mAdapter.addAll(data);
-        }
-
+        mPresenter.onMoviesLoaded(data);
+        mAdapter.addAll(mPresenter.onMoviesRequested(movieType));
         //Log.v(LOG_TAG, "Loader is done loading: " + loader.getId());
     }
 
-    public void onLoaderReset(Loader<List<MovieClass>> loader) {
+    public void onLoaderReset(Loader<HashMap<String, List<MovieClass>>> loader) {
         mAdapter.clear();
     }
+
 }

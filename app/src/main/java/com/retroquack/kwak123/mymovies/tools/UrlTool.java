@@ -47,7 +47,7 @@ public class UrlTool {
         return buildUrl(TYPE_RATING, null);
     }
 
-    public static URL buildImageUrl(String imageUrl) {
+    public static URL buildPosterUrl(String imageUrl) {
         return buildUrl(TYPE_IMAGE, imageUrl);
     }
 

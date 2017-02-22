@@ -17,11 +17,12 @@ public class DetailsActivity extends AppCompatActivity {
 
         // Takes the MovieClass object from the intent and passes it into the DetailsFragment
         Intent intent = getIntent();
-        MovieClass movieClass = intent.getParcelableExtra(MovieClass.CLASS_KEY);
+        int type = intent.getIntExtra(MovieClass.TYPE_KEY, -1);
+        int position = intent.getIntExtra(MovieClass.POSITION_KEY, -1);
 
         if (savedInstanceState == null) {
             getFragmentManager().beginTransaction()
-                    .add(R.id.container_details, DetailsFragment.newInstance(movieClass))
+                    .add(R.id.container_details, DetailsFragment.newInstance(type, position))
                     .commit();
         }
     }

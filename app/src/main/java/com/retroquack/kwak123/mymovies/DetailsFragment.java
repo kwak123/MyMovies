@@ -9,17 +9,18 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.CheckBox;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
+import com.retroquack.kwak123.mymovies.loaders.DetailLoader;
+import com.retroquack.kwak123.mymovies.loaders.DetailQuery;
 import com.retroquack.kwak123.mymovies.model.DetailClass;
 import com.retroquack.kwak123.mymovies.model.MovieClass;
-import com.retroquack.kwak123.mymovies.network.DetailLoader;
-import com.retroquack.kwak123.mymovies.network.DetailQuery;
 import com.retroquack.kwak123.mymovies.presenter.DetailsPresenterImpl;
-import com.squareup.picasso.Callback;
+import com.retroquack.kwak123.mymovies.tools.UrlTool;
 import com.squareup.picasso.Picasso;
 
 import java.util.HashMap;
@@ -29,12 +30,9 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.Unbinder;
 
-/**
- * This is the screen for holding the user's interactions.
- * No lambdas because I didn't want to lose Instant Run.
+/** Loads relevant details for user
  *
- * TODO: Add favorites option
- * TODO: Add menu button to see other favorites, etc.
+ * TODO: Shift view logic to presenter
  */
 
 public class DetailsFragment extends Fragment implements
@@ -49,7 +47,6 @@ public class DetailsFragment extends Fragment implements
     private DetailsPresenterImpl mPresenter;
 
     private MovieClass mMovieClass;
-
     private HashMap<String, List<DetailClass>> mData;
 
     @BindView(R.id.poster_detail_view) ImageView posterView;
@@ -60,35 +57,45 @@ public class DetailsFragment extends Fragment implements
     @BindView(R.id.movie_overview) TextView overviewView;
     @BindView(R.id.container_trailers) LinearLayout trailersLayout;
     @BindView(R.id.container_reviews) LinearLayout reviewsLayout;
+    @BindView(R.id.checkbox_favorite) CheckBox favoriteCheckBox;
 
     // Factory method to be called in DetailsActivity so that a movieClass object
     // can be passed into the fragment
-    public static DetailsFragment newInstance(MovieClass movieClass) {
+
+    /**@param type the type of MovieClass in the MovieList
+     * @param position the position of the MovieClass in the MovieList
+     * @return a new DetailFragment.
+     *
+     * If the default value of -1 is ever reached, something is very wrong.
+     */
+    public static DetailsFragment newInstance(int type, int position) {
         DetailsFragment fragment = new DetailsFragment();
         Bundle bundle = new Bundle();
-        bundle.putParcelable(MovieClass.CLASS_KEY, movieClass);
+        bundle.putInt(MovieClass.TYPE_KEY, type);
+        bundle.putInt(MovieClass.POSITION_KEY, position);
         fragment.setArguments(bundle);
 
         return fragment;
     }
 
-
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         Bundle bundle = getArguments();
-        mMovieClass = bundle.getParcelable(MovieClass.CLASS_KEY);
+        int mMovieType = bundle.getInt(MovieClass.TYPE_KEY);
+        int mMoviePosition = bundle.getInt(MovieClass.POSITION_KEY);
 
+        mPresenter = new DetailsPresenterImpl(getActivity(), mMovieType);
+        mMovieClass = mPresenter.getMovieClass(mMoviePosition);
         mDisplayMetrics = new DisplayMetrics();
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+                             Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.fragment_detail, container, false);
 
         getActivity().getWindowManager().getDefaultDisplay().getMetrics(mDisplayMetrics);
-
-        mPresenter = new DetailsPresenterImpl(getActivity());
 
         unbinder = ButterKnife.bind(this, rootView);
 
@@ -98,16 +105,19 @@ public class DetailsFragment extends Fragment implements
         ratingView.setText(mMovieClass.getRating());
         releaseView.setText(mMovieClass.getRelease());
         overviewView.setText(mMovieClass.getOverview());
+        favoriteCheckBox.setChecked(mMovieClass.getFavorite());
+
+        Log.v(LOG_TAG, "Movie favorited? " + mMovieClass.getFavorite());
 
         backdropView.getLayoutParams().height = mDisplayMetrics.widthPixels * 104 / 185;
         Log.v(LOG_TAG, Integer.toString(mDisplayMetrics.widthPixels * 104 / 185));
 
         Picasso.with(getActivity())
-                .load(mMovieClass.getPosterUrl())
+                .load(UrlTool.buildPosterUrl(mMovieClass.getPosterKey()).toString())
                 .into(posterView);
 
         Glide.with(getActivity())
-                .load(mMovieClass.getBackdropUrl())
+                .load(UrlTool.buildBackdropUrl(mMovieClass.getBackdropKey()).toString())
                 .into(backdropView);
 
         getLoaderManager().initLoader(0, null, this);
@@ -115,14 +125,21 @@ public class DetailsFragment extends Fragment implements
         return rootView;
     }
 
+    // Save Favorites information
+    @Override
+    public void onPause() {
+        mPresenter.onFavoritesSelected(favoriteCheckBox.isChecked(), mMovieClass);
+        super.onPause();
+    }
+
+    // Unbind ButterKnife
     @Override
     public void onDestroyView() {
         super.onDestroyView();
         unbinder.unbind();
     }
 
-    // Loader is below
-
+    // Loader
     @Override
     public Loader<HashMap<String, List<DetailClass>>> onCreateLoader(int id, Bundle args) {
         Log.v(LOG_TAG, "Loader started");
@@ -147,6 +164,7 @@ public class DetailsFragment extends Fragment implements
         mData = null;
     }
 
+    // OnClick Logic
     private void updateTrailers(List<DetailClass> trailersList) {
 
         Log.v(LOG_TAG, "Updating trailers!");
@@ -264,5 +282,4 @@ public class DetailsFragment extends Fragment implements
         }
 
     }
-
 }

@@ -1,7 +1,7 @@
 package com.retroquack.kwak123.mymovies.data;
 
 /**
- * Created by kwak123 on 1/12/2017.
+ * Left as part of skeleton, in case I ever come back to this
  */
 
 public class MovieProvider {

@@ -1,6 +1,6 @@
 package com.retroquack.kwak123.mymovies;
 
-import com.retroquack.kwak123.mymovies.network.TestQueries;
+import com.retroquack.kwak123.mymovies.loaders.TestQueries;
 
 import org.junit.runner.RunWith;
 import org.junit.runners.Suite;

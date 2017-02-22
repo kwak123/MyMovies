@@ -1,90 +1,57 @@
 package com.retroquack.kwak123.mymovies.model;
 
-import android.os.Parcel;
-import android.os.Parcelable;
-
-import com.retroquack.kwak123.mymovies.tools.UrlTool;
-
-import io.realm.RealmObject;
-import io.realm.annotations.PrimaryKey;
-
 /**
  * Custom MovieClass that holds the data I want from the JSON object.
  * I wanted to store everything as Strings just to keep the data simpler
+ *
+ * Don't need to be parcelable with new data structure!
+ *
+ * Methods rewritten for encapsulation
  */
 
-public class MovieClass implements Parcelable {
+public class MovieClass {
 
     private String mId;
-    private String mPosterUrl;
-    private String mBackdropUrl;
+    private String mPosterKey;
+    private String mBackdropKey;
     private String mTitle;
     private String mRating;
     private String mPopular;
     private String mRelease;
     private String mOverview;
+    private boolean mFavorited = false;
 
-    // For use when parceling an instance of the object
-    public static final String CLASS_KEY = "movieClass";
+    // For use when sending movie class reference
+    public static final String POSITION_KEY = "position";
+    public static final String TYPE_KEY = "type";
 
-    public MovieClass(String posterUrl, String backdropUrl, String title, String rating,
-                      String popular, String release, String overview, String id) {
-        mPosterUrl = UrlTool.buildImageUrl(posterUrl).toString();
-        mBackdropUrl = UrlTool.buildBackdropUrl(backdropUrl).toString();
+    // Statics for use when specifying movie classes
+    public static final int TYPE_POPULAR = 0;
+    public static final int TYPE_RATING = 1;
+    public static final int TYPE_FAVORITE = 2;
+
+    public MovieClass(String id, String posterKey, String backdropKey, String title, String rating,
+                      String popular, String release, String overview) {
+        mId = id;
+        mPosterKey = posterKey;
+        mBackdropKey = backdropKey;
         mTitle = title;
         mRating = formatRating(rating);
         mPopular = popular;
         mRelease = formatDate(release);
         mOverview = overview;
-        mId = id;
     }
 
-    private MovieClass(Parcel in) {
-        mPosterUrl = in.readString();
-        mBackdropUrl = in.readString();
-        mTitle = in.readString();
-        mRating = in.readString();
-        mPopular = in.readString();
-        mRelease = in.readString();
-        mOverview = in.readString();
-        mId = in.readString();
+    public void setFavorited(Boolean favorited) {
+        mFavorited = favorited;
     }
 
-    @Override
-    public int describeContents() {
-        return 0;
+    public String getPosterKey() {
+        return mPosterKey;
     }
 
-    @Override
-    public void writeToParcel(Parcel parcel, int i) {
-        parcel.writeString(mPosterUrl);
-        parcel.writeString(mBackdropUrl);
-        parcel.writeString(mTitle);
-        parcel.writeString(mRating);
-        parcel.writeString(mPopular);
-        parcel.writeString(mRelease);
-        parcel.writeString(mOverview);
-        parcel.writeString(mId);
-    }
-
-    public static final Parcelable.Creator<MovieClass> CREATOR = new Parcelable.Creator<MovieClass>() {
-        @Override
-        public MovieClass createFromParcel(Parcel parcel) {
-            return new MovieClass(parcel);
-        }
-
-        @Override
-        public MovieClass[] newArray(int i) {
-            return new MovieClass[i];
-        }
-    };
-
-    public String getPosterUrl() {
-        return mPosterUrl;
-    }
-
-    public String getBackdropUrl() {
-        return mBackdropUrl;
+    public String getBackdropKey() {
+        return mBackdropKey;
     }
 
     public String getMovieTitle() {
@@ -109,6 +76,10 @@ public class MovieClass implements Parcelable {
 
     public String getId() {
         return mId;
+    }
+
+    public boolean getFavorite() {
+        return mFavorited;
     }
 
     // Only the year
