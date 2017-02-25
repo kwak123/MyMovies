@@ -3,7 +3,7 @@
 Several parts of the application were made using the Udacity codebase as a starting point. Refer to in-line documentation to see where. <br/>
 To start, place your TMDb API key in the application level build.gradle, specified as **YOUR_API_KEY_HERE**. <br/>
 Minimum SDK set to 21 to try newer Android features, including animation changes. <br/>
-<br/>
+
 ## TMDB
 ![alt text](https://www.themoviedb.org/assets/static_cache/9b3f9c24d9fd5f297ae433eb33d93514/images/v4/logos/408x161-powered-by-rectangle-green.png)<br/>
 This product uses the [TMDb](https://www.themoviedb.org/?language=en) API but is not endorsed or certified by TMDb. <br/>
