@@ -12,6 +12,7 @@ This product uses the [TMDb](https://www.themoviedb.org/?language=en) API but is
 
 ## Libraries
 [ButterKnife by Jake Wharton](https://github.com/JakeWharton/butterknife "ButterKnife GitHub") <br/>
+[Picasso by Square](https://github.com/square/picasso)<br/>
 [Glide by BumpTech](https://github.com/bumptech/glide "Glide GitHub") <br/>
 [OkHttp by Square](https://github.com/square/okhttp "OkHttp GitHub") <br/>
 [Dagger2 by Google](https://github.com/google/dagger "Dagger2 GitHub") <br/>
