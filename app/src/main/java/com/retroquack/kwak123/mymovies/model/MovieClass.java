@@ -1,17 +1,16 @@
 package com.retroquack.kwak123.mymovies.model;
 
 /**
- * Custom MovieClass that holds the data I want from the JSON object.
- * I wanted to store everything as Strings just to keep the data simpler
+ * MovieClass, holds all information as Strings.
  *
- * Don't need to be parcelable with new data structure!
+ * Removed Parcelable, Intents pass index and type to MovieRepository singleton.
  *
  * Methods rewritten for encapsulation
  */
 
 public class MovieClass {
 
-    private String mId;
+    private String mKey;
     private String mPosterKey;
     private String mBackdropKey;
     private String mTitle;
@@ -19,6 +18,8 @@ public class MovieClass {
     private String mPopular;
     private String mRelease;
     private String mOverview;
+
+    // Default is false, see MovieRepositoryImpl
     private boolean mFavorited = false;
 
     // For use when sending movie class reference
@@ -30,9 +31,9 @@ public class MovieClass {
     public static final int TYPE_RATING = 1;
     public static final int TYPE_FAVORITE = 2;
 
-    public MovieClass(String id, String posterKey, String backdropKey, String title, String rating,
+    public MovieClass(String key, String posterKey, String backdropKey, String title, String rating,
                       String popular, String release, String overview) {
-        mId = id;
+        mKey = key;
         mPosterKey = posterKey;
         mBackdropKey = backdropKey;
         mTitle = title;
@@ -74,8 +75,8 @@ public class MovieClass {
         return mOverview;
     }
 
-    public String getId() {
-        return mId;
+    public String getKey() {
+        return mKey;
     }
 
     public boolean getFavorite() {
@@ -87,7 +88,7 @@ public class MovieClass {
         return input.substring(0, 4);
     }
 
-    // Make it obvious that the scale is out of 10
+    // Format score to #/10
     private String formatRating(String input) {
         return input + "/10";
     }

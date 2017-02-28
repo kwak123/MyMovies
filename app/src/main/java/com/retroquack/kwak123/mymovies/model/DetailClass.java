@@ -3,7 +3,9 @@ package com.retroquack.kwak123.mymovies.model;
 import com.retroquack.kwak123.mymovies.tools.UrlTool;
 
 /**
- * Created by kwak123 on 12/26/2016.
+ * Review and Trailer class.
+ *
+ * One model used, less loaders required.
  */
 
 public class DetailClass {

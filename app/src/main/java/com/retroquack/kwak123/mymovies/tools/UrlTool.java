@@ -1,9 +1,5 @@
 package com.retroquack.kwak123.mymovies.tools;
 
-/**
- * Created by kwak123 on 10/19/2016.
- */
-
 import android.net.Uri;
 import android.util.Log;
 
@@ -14,10 +10,10 @@ import java.net.URL;
 
 /**
  * Holds static factory methods for building URLs throughout the app.
- * I did not add in safety features yet.
+ * URLs are typically converted to strings to keep in line with APIs
  */
 
-public class UrlTool {
+public final class UrlTool {
     private static final String LOG_TAG = UrlTool.class.getSimpleName();
 
     private static final int TYPE_POPULAR = 0;
@@ -29,14 +25,6 @@ public class UrlTool {
     private static final int TYPE_YOUTUBE_STILL = 6;
     private static final int TYPE_REVIEW = 7;
 
-    /**
-     * For types, 0 = popular, 1 = top-rated, 2 = poster, 3 = backdrop
-     *
-     * Note that buildPopularUrl and buildRatingUrl take null as the string input, because
-     * those are generic queries
-     */
-
-    //Constructor here, marked private to protect class
     private UrlTool() {}
 
     public static URL buildPopularUrl() {
@@ -47,8 +35,8 @@ public class UrlTool {
         return buildUrl(TYPE_RATING, null);
     }
 
-    public static URL buildPosterUrl(String imageUrl) {
-        return buildUrl(TYPE_IMAGE, imageUrl);
+    public static URL buildPosterUrl(String posterUrl) {
+        return buildUrl(TYPE_IMAGE, posterUrl);
     }
 
     public static URL buildBackdropUrl(String backdropUrl) {
@@ -71,7 +59,13 @@ public class UrlTool {
         return buildUrl(TYPE_REVIEW, movieID);
     }
 
-    // The tool used in the static factory methods to create the URL based on input.
+    /**
+     * URL factory. Pass in int and item spec, return URL, EZPZ.
+     *
+     * @param type identify the requested URL
+     * @param itemSpec additional input for building
+     * @return a URL. Convert to String to keep in line with APIs
+     */
     private static URL buildUrl(int type, String itemSpec) {
         final String POPULAR = "popular/";
         final String RATING = "top_rated/";

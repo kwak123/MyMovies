@@ -6,6 +6,11 @@
         android:title="@string/action_refresh"
         app:showAsAction="never" />
 
+    <item android:id="@+id/clear_favorites"
+          android:title="@string/action_delete"
+          android:orderInCategory="102"
+          app:showAsAction="never" />
+
     <item android:id="@+id/pref_spinner"
         android:title=""
         app:showAsAction="ifRoom"

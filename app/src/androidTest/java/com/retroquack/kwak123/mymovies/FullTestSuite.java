@@ -1,12 +1,11 @@
 package com.retroquack.kwak123.mymovies;
 
-import com.retroquack.kwak123.mymovies.loaders.TestQueries;
+import com.retroquack.kwak123.mymovies.data.network.TestQueries;
 
 import org.junit.runner.RunWith;
 import org.junit.runners.Suite;
 
-/**
- * Created by kwak123 on 1/9/2017.
+/**Test
  */
 
 @RunWith(Suite.class)
