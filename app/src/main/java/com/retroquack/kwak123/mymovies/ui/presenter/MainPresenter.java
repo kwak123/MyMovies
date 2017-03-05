@@ -17,6 +17,8 @@ public interface MainPresenter {
      */
     void onMoviesLoaded(HashMap<String, List<MovieClass>> data);
 
+    void clearDatabase();
+
     /** Ensure the AdapterView in case of changes made while in DetailFragment
      */
     void onResume();
@@ -27,11 +29,4 @@ public interface MainPresenter {
      * @return returns the specified MovieClass List
      */
     List<MovieClass> onMoviesRequested(int type);
-
-    /** Opens up the correct DetailsFragment upon user selection
-     *
-     * @param type specifies which list MovieClass is located in
-     * @param position specifies which index MovieClass is in
-     */
-    void onMovieClicked(int type, int position);
 }

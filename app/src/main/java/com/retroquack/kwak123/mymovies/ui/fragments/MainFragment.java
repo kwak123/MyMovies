@@ -3,7 +3,6 @@ package com.retroquack.kwak123.mymovies.ui.fragments;
 import android.app.Fragment;
 import android.app.LoaderManager;
 import android.content.Context;
-import android.content.Intent;
 import android.content.Loader;
 import android.os.Bundle;
 import android.support.v4.view.MenuItemCompat;
@@ -19,18 +18,16 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.GridView;
 import android.widget.Spinner;
-import android.widget.Toast;
 
 import com.retroquack.kwak123.mymovies.MyMoviesApp;
 import com.retroquack.kwak123.mymovies.R;
-import com.retroquack.kwak123.mymovies.data.repository.MovieRepository;
-import com.retroquack.kwak123.mymovies.ui.activities.DetailsActivity;
-import com.retroquack.kwak123.mymovies.ui.adapters.MovieAdapter;
 import com.retroquack.kwak123.mymovies.data.network.MovieLoader;
+import com.retroquack.kwak123.mymovies.data.repository.MovieRepository;
+import com.retroquack.kwak123.mymovies.data.repository.MovieRepositoryImpl;
 import com.retroquack.kwak123.mymovies.model.MovieClass;
+import com.retroquack.kwak123.mymovies.ui.adapters.MovieAdapter;
 import com.retroquack.kwak123.mymovies.ui.presenter.MainPresenter;
 import com.retroquack.kwak123.mymovies.ui.presenter.MainPresenterImpl;
-import com.retroquack.kwak123.mymovies.data.repository.MovieRepositoryImpl;
 import com.retroquack.kwak123.mymovies.ui.views.MainView;
 
 import java.util.ArrayList;
@@ -61,14 +58,19 @@ public class MainFragment extends Fragment implements
     private int spinnerPos;
     private int mMovieType;
     private MainPresenter mPresenter;
+    private Callback callback;
 
     private boolean hasStarted = false;
+
+    // Dagger
+    @Inject MovieRepository mMovieRepository;
 
     public MainFragment() {
     }
 
-    // Dagger
-    @Inject MovieRepository mMovieRepository;
+    public interface Callback {
+        void onMovieClicked(int type, int position);
+    }
 
     // Lifecycle
     @Override
@@ -76,6 +78,7 @@ public class MainFragment extends Fragment implements
         super.onAttach(context);
         ((MyMoviesApp) getActivity().getApplication())
                 .getAndroidComponent().inject(this);
+        callback = (Callback) getActivity();
     }
 
     @Override
@@ -130,23 +133,9 @@ public class MainFragment extends Fragment implements
     private AdapterView.OnItemClickListener mOnClickListener = new AdapterView.OnItemClickListener() {
         @Override
         public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-            mPresenter.onMovieClicked(mMovieType, position);
+            callback.onMovieClicked(mMovieType, position);
         }
     };
-
-    @Override
-    public void loadMovieDetail(int type, int position) {
-        Intent intent = new Intent(getActivity(), DetailsActivity.class);
-        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-        intent.putExtra(MovieClass.TYPE_KEY, type);
-        intent.putExtra(MovieClass.POSITION_KEY, position);
-        startActivity(intent);
-    }
-
-    @Override
-    public void noMovieDetail() {
-        Toast.makeText(getActivity(), R.string.no_movie, Toast.LENGTH_SHORT).show();
-    }
 
     @Override
     public void refreshAdapter() {
@@ -171,7 +160,7 @@ public class MainFragment extends Fragment implements
                 getLoaderManager().initLoader(0, null, this).forceLoad();
                 break;
             case R.id.clear_favorites:
-                mMovieRepository.clearDatabase();
+                mPresenter.clearDatabase();
                 break;
             default:
                 break;

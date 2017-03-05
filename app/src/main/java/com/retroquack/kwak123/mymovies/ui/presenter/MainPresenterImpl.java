@@ -12,6 +12,8 @@ import java.util.List;
 
 /**
  * Blueprint for handling user events.
+ *
+ * Extra level of abstraction
  */
 
 public class MainPresenterImpl implements MainPresenter{
@@ -33,6 +35,12 @@ public class MainPresenterImpl implements MainPresenter{
     }
 
     @Override
+    public void clearDatabase() {
+        mMovieRepository.clearDatabase();
+        mView.refreshAdapter();
+    }
+
+    @Override
     public void onResume() {
         mMovieRepository.refreshMovies();
         mView.refreshAdapter();
@@ -50,18 +58,6 @@ public class MainPresenterImpl implements MainPresenter{
             default:
                 return null;
         }
-    }
-
-    @Override
-    public void onMovieClicked(int type, int position) {
-        Log.v(LOG_TAG, "Clicked position at: " + position);
-        MovieClass movieClass = mMovieRepository.getMovieClass(type, position);
-        if (movieClass == null) {
-            mView.noMovieDetail();
-            return;
-        }
-        mView.loadMovieDetail(type, position);
-
     }
 
 

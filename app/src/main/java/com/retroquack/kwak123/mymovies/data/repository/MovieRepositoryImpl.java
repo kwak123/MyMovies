@@ -24,8 +24,6 @@ public class MovieRepositoryImpl implements MovieRepository {
 
     private static final String LOG_TAG = MovieRepositoryImpl.class.getSimpleName();
 
-    private static MovieRepositoryImpl moviePresenterImpl;
-
     private static List<MovieClass> mPopularMovies;
     private static List<MovieClass> mRatingMovies;
     private static List<MovieClass> mFavoriteMovies;
@@ -141,6 +139,11 @@ public class MovieRepositoryImpl implements MovieRepository {
 
             cursor.close();
         }
+    }
+
+    @Override
+    public boolean isNull(int type, int position) {
+        return getMovieClass(type, position) == null;
     }
 
     // Database methods

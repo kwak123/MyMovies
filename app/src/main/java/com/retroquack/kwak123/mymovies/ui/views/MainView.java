@@ -5,10 +5,5 @@ package com.retroquack.kwak123.mymovies.ui.views;
  */
 
 public interface MainView {
-
-    void loadMovieDetail(int type, int position);
-
-    void noMovieDetail();
-
     void refreshAdapter();
 }

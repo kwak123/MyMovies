@@ -117,6 +117,7 @@ public final class MovieProvider extends ContentProvider {
             case DELETE:
                 rowDeleted = db.delete(MovieContract.MovieEntry.TABLE_NAME, null, null);
                 Log.v(LOG_TAG, "Deleted " + rowDeleted + " rows");
+                break;
             default:
                 throw new UnsupportedOperationException("Failed to match uri: " + uri);
         }
@@ -155,7 +156,7 @@ public final class MovieProvider extends ContentProvider {
                 FAVORITES_KEY);
 
         matcher.addURI(authority,
-                MovieContract.PATH_DELETE,
+                MovieContract.PATH_FAVORITE + "/" + MovieContract.PATH_DELETE,
                 DELETE);
 
         return matcher;

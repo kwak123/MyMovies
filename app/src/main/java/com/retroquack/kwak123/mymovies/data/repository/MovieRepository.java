@@ -54,6 +54,11 @@ public interface MovieRepository {
      */
     void clearDatabase();
 
+    /**
+     * Check to see if movie class exists here
+     */
+    boolean isNull(int type, int position);
+
     /** Fetch the popular movies list
      *
      * @return List of top 20 popular movies.
