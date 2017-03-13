@@ -13,7 +13,15 @@ import java.util.List;
 
 public interface MovieRepository {
 
-    /** Binds data into the repository, then compares it against the database to properly set those
+    /**
+     * Interface for invoking callback to presenter
+     */
+    interface onChangeListener {
+        void notifyChange();
+    }
+
+    /**
+     * Binds data into the repository, then compares it against the database to properly set those
      * marked as favorite.
      *
      * @param movieClasses HashMap to bind Lists from MovieQuery
@@ -21,68 +29,54 @@ public interface MovieRepository {
     void bindMovieClasses(HashMap<String, List<MovieClass>> movieClasses);
 
     /**
-     *  Refreshes the data currently bound.
+     * Refreshes the data currently bound.
      */
     void refreshMovies();
 
-    /** Compares the MovieClasses and the Favorites database, applying favorited tags to those in
-     * both
+    /**
+     * Fetch the desired List&lt;MovieClass&gt;
      *
-     * @param movieClasses List of MovieClass used to
-     * @return List of MovieClasses tagged with favorites
+     * @param type which List&lt;MovieClass&gt; is requested
+     * @return above
      */
-    List<MovieClass> addFavoriteStatus(List<MovieClass> movieClasses);
+    List<MovieClass> getMovies(int type);
 
-    /** Refreshes the Favorites Movies list
+    /**
+     * Fetch the desired movie
+     * @param type which MovieClass variant
+     * @param position where MovieClass is on the List&lt;MovieClass&gt; of above variant
+     * @return MovieClass as defined by above.
      */
-    void updateFavoriteMovies();
-
-    /** Adds a MovieClass to the database when favorited
-     *
-     * @param movieClass passed into database
-     */
-    void addToDatabase(MovieClass movieClass);
-
-    /** Deletes a MovieClass from the database when unfavorited
-     *
-     * @param movieClass removed from database
-     */
-    void deleteFromDatabase(MovieClass movieClass);
-
-    /** Clear the current favorites list
-     *
-     */
-    void clearDatabase();
+    MovieClass getMovieClass(int type, int position);
 
     /**
      * Check to see if movie class exists here
      */
     boolean isNull(int type, int position);
 
-    /** Fetch the popular movies list
+    /**
+     * Adds a MovieClass to the database when favorited
      *
-     * @return List of top 20 popular movies.
+     * @param movieClass passed into database
      */
-    List<MovieClass> getPopularMovies();
+    void addToDatabase(MovieClass movieClass);
 
-    /** Fetch the top rated movies list
+    /**
+     * Deletes a MovieClass from the database when unfavorited
      *
-     * @return List of 20 highest-rated movies
+     * @param movieClass removed from database
      */
-    List<MovieClass> getRatingMovies();
+    void deleteFromDatabase(MovieClass movieClass);
 
-    /** Fetch the user's favorite movies
+    /**
+     * Clear the current favorites list
+     */
+    void clearDatabase();
+
+    /**
+     * Bind listener to repository
      *
-     * @return List of the user's current favorited movies.
+     * @param listener presenter that is attached to a refreshing view
      */
-    List<MovieClass> getFavoriteMovies();
-
-    /** Returns the MovieClass associated with the list
-     *
-     * @param type specifies which list to get MovieClass from
-     * @param position specifies where in list MovieClass is located
-     * @return MovieClass as specified
-     */
-    MovieClass getMovieClass(int type, int position);
-
+    void setOnChangeListener(onChangeListener listener);
 }

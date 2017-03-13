@@ -114,7 +114,6 @@ public final class MovieQuery  {
         } catch (IOException ex) {
             Log.e(LOG_TAG, "Error retrieving movie classes: " + ex);
         }
-
         if (!TextUtils.isEmpty(requestResponse)) {
             Log.v(LOG_TAG, "Response Success!");
         }
@@ -124,7 +123,7 @@ public final class MovieQuery  {
     // JSON parser
     private static List<MovieClass> parseJsonData(String jsonResponseString) {
 
-        Log.v(LOG_TAG, jsonResponseString);
+//        Log.v(LOG_TAG, jsonResponseString);
         List<MovieClass> movieClasses = new ArrayList<>();
 
         if (TextUtils.isEmpty(jsonResponseString)) {

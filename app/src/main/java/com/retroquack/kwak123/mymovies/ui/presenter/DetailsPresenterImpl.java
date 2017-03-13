@@ -1,7 +1,12 @@
 package com.retroquack.kwak123.mymovies.ui.presenter;
 
+import com.retroquack.kwak123.mymovies.R;
 import com.retroquack.kwak123.mymovies.data.repository.MovieRepository;
 import com.retroquack.kwak123.mymovies.model.MovieClass;
+import com.retroquack.kwak123.mymovies.ui.views.DetailsView;
+
+import static android.R.attr.id;
+import static com.retroquack.kwak123.mymovies.R.string.favorite;
 
 /**
  * Handles user events
@@ -13,10 +18,12 @@ public class DetailsPresenterImpl implements DetailsPresenter {
 
     private static final String LOG_TAG = DetailsPresenterImpl.class.getSimpleName();
 
+    private DetailsView mView;
     private MovieRepository mMovieRepository;
     private int mType;
 
-    public DetailsPresenterImpl(MovieRepository movieRepository, int type) {
+    public DetailsPresenterImpl(DetailsView view, MovieRepository movieRepository, int type) {
+        mView = view;
         mType = type;
         mMovieRepository = movieRepository;
     }
@@ -27,20 +34,13 @@ public class DetailsPresenterImpl implements DetailsPresenter {
     }
 
     @Override
-    public void onFavoritesSelected(boolean favorite, MovieClass movieClass) {
-
-        if (favorite == movieClass.getFavorite()) {
-//            Log.v(LOG_TAG, "Movie not added to db");
-            return;
-        }
-
-        if (favorite && !movieClass.getFavorite()) {
-            mMovieRepository.addToDatabase(movieClass);
-//            Log.v(LOG_TAG, movieClass.getPosterUrl());
-        } else {
+    public void onFavoritesSelected(boolean isChecked, MovieClass movieClass) {
+        if (!isChecked) {
             mMovieRepository.deleteFromDatabase(movieClass);
+        } else {
+            mMovieRepository.addToDatabase(movieClass);
         }
-
+        mView.onFavoritesChanged(isChecked);
         mMovieRepository.refreshMovies();
     }
 }

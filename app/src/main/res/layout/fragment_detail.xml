@@ -7,10 +7,11 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical">
+        android:orientation="vertical"
+        android:animateLayoutChanges="true">
 
         <ImageView
-            android:id="@+id/backdrop_view"
+            android:id="@+id/backdrop_detail_view"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:scaleType="fitStart"
@@ -26,7 +27,7 @@
                 android:id="@+id/poster_detail_view"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_margin="@dimen/activity_horizontal_margin"
+                android:layout_margin="@dimen/activity_vertical_margin"
                 android:scaleType="fitStart"
                 android:adjustViewBounds="true"
                 android:focusable="false"
@@ -37,15 +38,14 @@
                 android:id="@+id/movie_details_layout"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/activity_vertical_margin"
                 android:orientation="vertical">
 
                 <TextView
                     android:id="@+id/movie_title"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="@dimen/activity_vertical_margin"
-                    android:textAppearance="?android:textAppearanceMedium"
-                    android:textColor="@android:color/black"/>
+                    style="@style/MovieTitle" />
 
                 <TextView
                     android:id="@+id/movie_rating"
@@ -65,27 +65,62 @@
             android:id="@+id/movie_overview"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginLeft="@dimen/activity_horizontal_margin"
-            android:layout_marginRight="@dimen/activity_horizontal_margin"
+            android:layout_marginLeft="@dimen/activity_vertical_margin"
+            android:layout_marginRight="@dimen/activity_vertical_margin"
             android:layout_marginBottom="@dimen/activity_vertical_margin"/>
 
         <LinearLayout
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content">
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/activity_vertical_margin"
+            android:orientation="horizontal">
 
             <TextView
-                android:layout_marginLeft="@dimen/activity_horizontal_margin"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@string/favorite"
                 android:fontFamily="sans-serif-medium"/>
-
             <CheckBox
                 android:id="@+id/checkbox_favorite"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"/>
 
         </LinearLayout>
+
+        <RelativeLayout
+            android:id="@+id/layout_favorites_confirm"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/activity_vertical_margin"
+            android:layout_marginEnd="@dimen/activity_vertical_margin"
+            android:visibility="gone">
+
+            <TextView
+                style="@style/ConfirmMessage"
+                android:id="@+id/details_message"/>
+
+            <TextView
+                style="@style/ConfirmButton"
+                android:id="@+id/details_no"
+                android:layout_alignParentEnd="true"
+                android:duplicateParentState="true"
+                android:text="@string/button_no"/>
+
+            <TextView
+                style="@style/ConfirmButton"
+                android:id="@+id/details_yes"
+                android:layout_toStartOf="@id/details_no"
+                android:layout_marginEnd="@dimen/activity_vertical_margin"
+                android:duplicateParentState="true"
+                android:text="@string/button_yes"/>
+
+        </RelativeLayout>
+
+        <View style="@style/Divider"
+            android:layout_marginTop="4dp"
+            android:layout_marginBottom="4dp"
+            android:layout_marginLeft="@dimen/activity_vertical_margin"
+            android:layout_marginRight="@dimen/activity_vertical_margin"/>
 
         <include layout="@layout/container_trailer"/>
 

@@ -2,8 +2,7 @@ package com.retroquack.kwak123.mymovies.model;
 
 /**
  * MovieClass, holds all information as Strings.
- *
- * Removed Parcelable, Intents pass index and type to MovieRepository singleton.
+ * Parcelable reimplemented to reduce overhead
  *
  * Methods rewritten for encapsulation
  */

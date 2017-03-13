@@ -49,21 +49,29 @@ public class MovieAdapter extends ArrayAdapter<MovieClass> {
 
         // ImageView loading for movie posters on the main fragment
 
-        Picasso.with(getContext())
-                .load(UrlTool.buildPosterUrl(movie.getPosterKey()).toString())
-                .into(holder.posterView);
+        if (movie != null) {
+            Picasso.with(getContext())
+                    .load(UrlTool.buildPosterUrl(movie.getPosterKey()).toString())
+                    .into(holder.posterView);
+
+            Picasso.with(getContext())
+                    .load(UrlTool.buildBackdropUrl(movie.getBackdropKey()).toString())
+                    .into(holder.backdropView);
+        } else {
+            holder.posterView.setImageResource(R.mipmap.no_pic);
+        }
 
         return convertView;
     }
 
     public void onFavoritesRefresh(List<MovieClass> movieClasses) {
-        clear();
         addAll(movieClasses);
         notifyDataSetChanged();
     }
 
     static class ViewHolder {
         @BindView(R.id.poster_view) ImageView posterView;
+        @BindView(R.id.backdrop_view) ImageView backdropView;
 
         ViewHolder(View view) {
             ButterKnife.bind(this, view);

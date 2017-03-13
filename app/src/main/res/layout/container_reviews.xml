@@ -5,15 +5,15 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="vertical"
+    android:layout_marginLeft="@dimen/activity_vertical_margin"
     android:animateLayoutChanges="true">
 
     <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:padding="8dp"
         android:text="@string/review_header"
-        android:textColor="@android:color/black"/>
+        style="@style/Header"/>
 
-    <View style="@style/Divider" />
+    <!--<View style="@style/Divider" />-->
 
 </LinearLayout>

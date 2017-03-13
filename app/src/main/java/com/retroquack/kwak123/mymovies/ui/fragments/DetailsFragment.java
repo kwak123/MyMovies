@@ -3,22 +3,20 @@ package com.retroquack.kwak123.mymovies.ui.fragments;
 import android.app.Fragment;
 import android.app.LoaderManager;
 import android.content.Context;
-import android.content.Intent;
 import android.content.Loader;
-import android.net.Uri;
 import android.os.Bundle;
-import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.CheckBox;
+import android.widget.CompoundButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.bumptech.glide.Glide;
 import com.retroquack.kwak123.mymovies.MyMoviesApp;
 import com.retroquack.kwak123.mymovies.R;
 import com.retroquack.kwak123.mymovies.data.network.DetailLoader;
@@ -26,10 +24,10 @@ import com.retroquack.kwak123.mymovies.data.network.DetailQuery;
 import com.retroquack.kwak123.mymovies.data.repository.MovieRepository;
 import com.retroquack.kwak123.mymovies.model.DetailClass;
 import com.retroquack.kwak123.mymovies.model.MovieClass;
+import com.retroquack.kwak123.mymovies.tools.UrlTool;
 import com.retroquack.kwak123.mymovies.ui.presenter.DetailsPresenter;
 import com.retroquack.kwak123.mymovies.ui.presenter.DetailsPresenterImpl;
-import com.retroquack.kwak123.mymovies.data.repository.MovieRepositoryImpl;
-import com.retroquack.kwak123.mymovies.tools.UrlTool;
+import com.retroquack.kwak123.mymovies.ui.views.DetailsView;
 import com.squareup.picasso.Picasso;
 
 import java.util.HashMap;
@@ -48,25 +46,29 @@ import butterknife.Unbinder;
  */
 
 public class DetailsFragment extends Fragment implements
-        LoaderManager.LoaderCallbacks<HashMap<String, List<DetailClass>>> {
+        LoaderManager.LoaderCallbacks<HashMap<String, List<DetailClass>>>,
+        DetailsView {
 
     private static final String LOG_TAG = DetailsFragment.class.getSimpleName();
-
-    private DisplayMetrics mDisplayMetrics;
 
     private Unbinder unbinder;
     private String mMovieKey;
     private DetailsPresenter mPresenter;
+    private DetailsCallback mCallback;
 
     private MovieClass mMovieClass;
     private HashMap<String, List<DetailClass>> mData;
 
     @BindView(R.id.poster_detail_view) ImageView posterView;
-    @BindView(R.id.backdrop_view) ImageView backdropView;
+    @BindView(R.id.backdrop_detail_view) ImageView backdropView;
     @BindView(R.id.movie_title) TextView titleView;
     @BindView(R.id.movie_rating) TextView ratingView;
     @BindView(R.id.movie_release) TextView releaseView;
     @BindView(R.id.movie_overview) TextView overviewView;
+    @BindView(R.id.layout_favorites_confirm) RelativeLayout favoritesLayout;
+    @BindView(R.id.details_yes) TextView yesTextView;
+    @BindView(R.id.details_no) TextView noTextView;
+    @BindView(R.id.details_message) TextView detailMessageView;
     @BindView(R.id.container_trailers) LinearLayout trailersLayout;
     @BindView(R.id.container_reviews) LinearLayout reviewsLayout;
     @BindView(R.id.checkbox_favorite) CheckBox favoriteCheckBox;
@@ -92,11 +94,16 @@ public class DetailsFragment extends Fragment implements
         return fragment;
     }
 
+    public interface DetailsCallback {
+        void onDetailsClicked(String url);
+    }
+
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
         ((MyMoviesApp) getActivity().getApplication())
                 .getAndroidComponent().inject(this);
+        mCallback = (DetailsCallback) getActivity();
     }
 
     @Override
@@ -105,18 +112,16 @@ public class DetailsFragment extends Fragment implements
         Bundle bundle = getArguments();
         int mMovieType = bundle.getInt(MovieClass.TYPE_KEY);
         int mMoviePosition = bundle.getInt(MovieClass.POSITION_KEY);
-
-        mPresenter = new DetailsPresenterImpl(mMovieRepository, mMovieType);
+        mPresenter = new DetailsPresenterImpl(this, mMovieRepository, mMovieType);
         mMovieClass = mPresenter.getMovieClass(mMoviePosition);
-        mDisplayMetrics = new DisplayMetrics();
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        View rootView = inflater.inflate(R.layout.fragment_detail, container, false);
 
-        getActivity().getWindowManager().getDefaultDisplay().getMetrics(mDisplayMetrics);
+
+        View rootView = inflater.inflate(R.layout.fragment_detail, container, false);
 
         unbinder = ButterKnife.bind(this, rootView);
 
@@ -128,29 +133,52 @@ public class DetailsFragment extends Fragment implements
         overviewView.setText(mMovieClass.getOverview());
         favoriteCheckBox.setChecked(mMovieClass.getFavorite());
 
-        Log.v(LOG_TAG, "Movie favorited? " + mMovieClass.getFavorite());
+        favoriteCheckBox.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                favoritesLayout.setVisibility((favoritesLayout.getVisibility()==View.VISIBLE) ?
+                        View.GONE : View.VISIBLE);
+                detailMessageView.setText((!mMovieClass.getFavorite()) ?
+                        R.string.add_favorite : R.string.remove_favorite);
+            }
+        });
 
-        backdropView.getLayoutParams().height = mDisplayMetrics.widthPixels * 104 / 185;
-        Log.v(LOG_TAG, Integer.toString(mDisplayMetrics.widthPixels * 104 / 185));
+        favoriteCheckBox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+            }
+        });
+
+        yesTextView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                mPresenter.onFavoritesSelected(favoriteCheckBox.isChecked(), mMovieClass);
+                favoritesLayout.setVisibility(View.GONE);
+            }
+        });
+
+        noTextView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                boolean store = favoriteCheckBox.isChecked();
+                favoriteCheckBox.setChecked(!store);
+                favoritesLayout.setVisibility(View.GONE);
+            }
+        });
+
+        Log.v(LOG_TAG, "Movie favorited? " + mMovieClass.getFavorite());
 
         Picasso.with(getActivity())
                 .load(UrlTool.buildPosterUrl(mMovieClass.getPosterKey()).toString())
                 .into(posterView);
 
-        Glide.with(getActivity())
+        Picasso.with(getActivity())
                 .load(UrlTool.buildBackdropUrl(mMovieClass.getBackdropKey()).toString())
                 .into(backdropView);
 
         getLoaderManager().initLoader(0, null, this);
 
         return rootView;
-    }
-
-    // Save Favorites information
-    @Override
-    public void onPause() {
-        mPresenter.onFavoritesSelected(favoriteCheckBox.isChecked(), mMovieClass);
-        super.onPause();
     }
 
     // Unbind ButterKnife
@@ -185,7 +213,13 @@ public class DetailsFragment extends Fragment implements
         mData = null;
     }
 
-    // OnClick Logic
+    @Override
+    public void onFavoritesChanged(boolean status) {
+        mMovieClass.setFavorited(status);
+        favoriteCheckBox.setChecked(status);
+    }
+
+    // DetailClass click logic
     private void updateTrailers(List<DetailClass> trailersList) {
 
         Log.v(LOG_TAG, "Updating trailers!");
@@ -211,13 +245,7 @@ public class DetailsFragment extends Fragment implements
                     @Override
                     public void onClick(View v) {
                         DetailClass detailClass = (DetailClass) v.getTag();
-                        Intent intent = new Intent(Intent.ACTION_VIEW,
-                                Uri.parse(detailClass.getTrailerUrl()));
-                        try {
-                            startActivity(intent);
-                        } catch (Exception ex){
-                            Toast.makeText(getActivity(), R.string.fail_connection, Toast.LENGTH_SHORT).show();
-                        }
+                        mCallback.onDetailsClicked(detailClass.getTrailerUrl());
                     }
                 });
 
@@ -275,13 +303,7 @@ public class DetailsFragment extends Fragment implements
                     @Override
                     public void onClick(View v) {
                         DetailClass detailClass = (DetailClass) v.getTag();
-                        Intent intent = new Intent(Intent.ACTION_VIEW,
-                                Uri.parse(detailClass.getReviewSummaryUrl()));
-                        try {
-                            startActivity(intent);
-                        } catch (Exception ex) {
-                            Toast.makeText(getActivity(), R.string.fail_connection, Toast.LENGTH_SHORT).show();
-                        }
+                        mCallback.onDetailsClicked(detailClass.getReviewSummaryUrl());
                     }
                 });
 

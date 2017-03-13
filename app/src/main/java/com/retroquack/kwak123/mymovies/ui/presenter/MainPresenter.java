@@ -1,5 +1,6 @@
 package com.retroquack.kwak123.mymovies.ui.presenter;
 
+import com.retroquack.kwak123.mymovies.data.repository.MovieRepository;
 import com.retroquack.kwak123.mymovies.model.MovieClass;
 
 import java.util.HashMap;

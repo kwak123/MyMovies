@@ -6,7 +6,8 @@
     android:orientation="horizontal"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:minHeight="?android:attr/listPreferredItemHeight">
+    android:minHeight="?android:attr/listPreferredItemHeight"
+    android:clickable="true">
 
     <FrameLayout
         android:id="@+id/trailer_image_layout"
@@ -24,11 +25,11 @@
     </FrameLayout>
 
     <TextView
-        android:text="THIS IS A TEST TITLE"
         android:id="@+id/trailer_title_view"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_toEndOf="@id/trailer_image_layout"
+        android:paddingLeft="4dp"
         android:layout_centerVertical="true" />
 
     <ImageView

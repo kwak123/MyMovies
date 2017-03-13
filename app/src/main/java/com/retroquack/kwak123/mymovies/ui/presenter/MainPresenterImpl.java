@@ -16,7 +16,7 @@ import java.util.List;
  * Extra level of abstraction
  */
 
-public class MainPresenterImpl implements MainPresenter{
+public class MainPresenterImpl implements MainPresenter, MovieRepository.onChangeListener {
 
     private static final String LOG_TAG = MainPresenterImpl.class.getSimpleName();
 
@@ -26,6 +26,7 @@ public class MainPresenterImpl implements MainPresenter{
     public MainPresenterImpl(MainView mainView, MovieRepository movieRepository) {
         mView = mainView;
         mMovieRepository = movieRepository;
+        mMovieRepository.setOnChangeListener(this);
     }
 
     @Override
@@ -37,29 +38,20 @@ public class MainPresenterImpl implements MainPresenter{
     @Override
     public void clearDatabase() {
         mMovieRepository.clearDatabase();
-        mView.refreshAdapter();
     }
 
     @Override
     public void onResume() {
         mMovieRepository.refreshMovies();
-        mView.refreshAdapter();
     }
 
     @Override
     public List<MovieClass> onMoviesRequested(int type) {
-        switch (type) {
-            case MovieRepositoryImpl.TYPE_POPULAR:
-                return mMovieRepository.getPopularMovies();
-            case MovieRepositoryImpl.TYPE_RATING:
-                return mMovieRepository.getRatingMovies();
-            case MovieRepositoryImpl.TYPE_FAVORITE:
-                return mMovieRepository.getFavoriteMovies();
-            default:
-                return null;
-        }
+        return mMovieRepository.getMovies(type);
     }
 
-
-
+    @Override
+    public void notifyChange() {
+        mView.refreshAdapter();
+    }
 }

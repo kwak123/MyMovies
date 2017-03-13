@@ -7,8 +7,8 @@ import android.database.Cursor;
 import android.net.Uri;
 import android.util.Log;
 
-import com.retroquack.kwak123.mymovies.data.provider.MovieContract.MovieEntry;
 import com.retroquack.kwak123.mymovies.data.network.MovieQuery;
+import com.retroquack.kwak123.mymovies.data.provider.MovieContract.MovieEntry;
 import com.retroquack.kwak123.mymovies.model.MovieClass;
 
 import java.util.ArrayList;
@@ -29,6 +29,7 @@ public class MovieRepositoryImpl implements MovieRepository {
     private static List<MovieClass> mFavoriteMovies;
 
     private ContentResolver mContentResolver;
+    private onChangeListener mOnChangeListener;
 
     public static final int TYPE_POPULAR = 0;
     public static final int TYPE_RATING = 1;
@@ -47,27 +48,127 @@ public class MovieRepositoryImpl implements MovieRepository {
         mContentResolver = contentResolver;
     }
 
-    // Data binding and associated helper methods
+    // Data handling
     @Override
     public void bindMovieClasses(HashMap<String, List<MovieClass>> movieClasses) {
-        mPopularMovies = addFavoriteStatus(movieClasses.get(MovieQuery.GROUP_POPULAR));
-        mRatingMovies = addFavoriteStatus(movieClasses.get(MovieQuery.GROUP_RATING));
-
-        updateFavoriteMovies();
-        mFavoriteMovies = getFavoriteMovies();
+        mPopularMovies = movieClasses.get(MovieQuery.GROUP_POPULAR);
+        mRatingMovies = movieClasses.get(MovieQuery.GROUP_RATING);
+        refreshMovies();
     }
 
     @Override
     public void refreshMovies() {
+        // Check for favorites
+        updateFavoriteMovies();
         mPopularMovies = addFavoriteStatus(mPopularMovies);
         mRatingMovies = addFavoriteStatus(mRatingMovies);
 
-        updateFavoriteMovies();
-        mFavoriteMovies = getFavoriteMovies();
+        mOnChangeListener.notifyChange();
     }
 
     @Override
-    public List<MovieClass> addFavoriteStatus(List<MovieClass> movieClasses) {
+    public List<MovieClass> getMovies(int type) {
+        switch (type) {
+            case MovieClass.TYPE_POPULAR:
+                return mPopularMovies;
+            case MovieClass.TYPE_RATING:
+                return mRatingMovies;
+            case MovieClass.TYPE_FAVORITE:
+                return mFavoriteMovies;
+            default:
+                return null;
+        }
+    }
+
+    @Override
+    public MovieClass getMovieClass(int type, int position) {
+        switch (type) {
+            case MovieClass.TYPE_POPULAR: {
+                return mPopularMovies.get(position);
+            }
+
+            case MovieClass.TYPE_RATING: {
+                return mRatingMovies.get(position);
+            }
+
+            case MovieClass.TYPE_FAVORITE: {
+                return mFavoriteMovies.get(position);
+            }
+
+            default:
+                return null;
+        }
+    }
+
+    @Override
+    public boolean isNull(int type, int position) {
+        return getMovieClass(type, position) == null;
+    }
+
+    // Database methods
+    @Override
+    public void addToDatabase(MovieClass movieClass) {
+        if (mFavoriteMovies != null && !mFavoriteMovies.isEmpty()) {
+            for (MovieClass movie : mFavoriteMovies) {
+                if (movie.getKey().equals(movieClass.getKey())) {
+                    return;
+                }
+            }
+        }
+
+        ContentValues values = new ContentValues();
+        values.put(MovieEntry.COLUMN_KEY, movieClass.getKey());
+        values.put(MovieEntry.COLUMN_POSTER_KEY, movieClass.getPosterKey());
+        values.put(MovieEntry.COLUMN_BACKDROP_KEY, movieClass.getBackdropKey());
+        values.put(MovieEntry.COLUMN_TITLE, movieClass.getMovieTitle());
+        values.put(MovieEntry.COLUMN_RATING, movieClass.getRating());
+        values.put(MovieEntry.COLUMN_POPULAR, movieClass.getPopular());
+        values.put(MovieEntry.COLUMN_RELEASE, movieClass.getRelease());
+        values.put(MovieEntry.COLUMN_OVERVIEW, movieClass.getOverview());
+
+        Uri insertedUri = mContentResolver
+                .insert(MovieEntry.CONTENT_URI, values);
+
+        // No inner join
+        long newRowId = ContentUris.parseId(insertedUri);
+        Log.v(LOG_TAG, "Entry inserted into line " + newRowId);
+
+        refreshMovies();
+    }
+
+    @Override
+    public void deleteFromDatabase(MovieClass movieClass) {
+        String selection = MovieEntry.COLUMN_KEY + "=?";
+        String[] selectionArgs = {movieClass.getKey()};
+
+
+        int deletedRowId = mContentResolver
+                .delete(MovieEntry.CONTENT_URI,
+                        selection,
+                        selectionArgs);
+        Log.v(LOG_TAG, "Entry deleted from line " + deletedRowId);
+
+        refreshMovies();
+    }
+
+    @Override
+    public void clearDatabase() {
+        int deletedRows = mContentResolver
+                .delete(MovieEntry.buildFavoritesClearUri(),
+                        null,
+                        null);
+        Log.v(LOG_TAG, "Total entries deleted: " + deletedRows);
+
+        refreshMovies();
+    }
+
+    @Override
+    public void setOnChangeListener(onChangeListener listener) {
+        mOnChangeListener = listener;
+    }
+
+    // Helper methods
+    private List<MovieClass> addFavoriteStatus(List<MovieClass> movieClasses) {
 
         if (movieClasses == null) {
             return null;
@@ -104,8 +205,7 @@ public class MovieRepositoryImpl implements MovieRepository {
         return movieClasses;
     }
 
-    @Override
-    public void updateFavoriteMovies() {
+    private void updateFavoriteMovies() {
         // Better make sure it's been instantiated
         if (mFavoriteMovies == null) {
             mFavoriteMovies = new ArrayList<>();
@@ -116,8 +216,11 @@ public class MovieRepositoryImpl implements MovieRepository {
         Cursor cursor = mContentResolver.query(MovieEntry.CONTENT_URI,
                 null, null, null, null, null);
 
-        if (cursor != null && cursor.moveToFirst()) {
+        if (cursor != null) {
             Log.v(LOG_TAG, "There are " + cursor.getCount() + " rows");
+        }
+
+        if (cursor != null && cursor.moveToFirst()) {
 
             do {
                 String key = cursor.getString(COL_KEY);
@@ -138,94 +241,6 @@ public class MovieRepositoryImpl implements MovieRepository {
             } while (cursor.moveToNext());
 
             cursor.close();
-        }
-    }
-
-    @Override
-    public boolean isNull(int type, int position) {
-        return getMovieClass(type, position) == null;
-    }
-
-    // Database methods
-    @Override
-    public void addToDatabase(MovieClass movieClass) {
-        ContentValues values = new ContentValues();
-        values.put(MovieEntry.COLUMN_KEY, movieClass.getKey());
-        values.put(MovieEntry.COLUMN_POSTER_KEY, movieClass.getPosterKey());
-        values.put(MovieEntry.COLUMN_BACKDROP_KEY, movieClass.getBackdropKey());
-        values.put(MovieEntry.COLUMN_TITLE, movieClass.getMovieTitle());
-        values.put(MovieEntry.COLUMN_RATING, movieClass.getRating());
-        values.put(MovieEntry.COLUMN_POPULAR, movieClass.getPopular());
-        values.put(MovieEntry.COLUMN_RELEASE, movieClass.getRelease());
-        values.put(MovieEntry.COLUMN_OVERVIEW, movieClass.getOverview());
-
-        Uri insertedUri = mContentResolver
-                .insert(MovieEntry.CONTENT_URI, values);
-
-        // No inner join
-        long newRowId = ContentUris.parseId(insertedUri);
-        Log.v(LOG_TAG, "Entry inserted into line " + newRowId);
-    }
-
-    @Override
-    public void deleteFromDatabase(MovieClass movieClass) {
-        String selection = MovieEntry.COLUMN_KEY + "=?";
-        String[] selectionArgs = {movieClass.getKey()};
-
-
-        int deletedRowId = mContentResolver
-                .delete(MovieEntry.CONTENT_URI,
-                        selection,
-                        selectionArgs);
-        Log.v(LOG_TAG, "Entry deleted from line " + deletedRowId);
-
-        refreshMovies();
-    }
-
-    @Override
-    public void clearDatabase() {
-        int deletedRows = mContentResolver
-                .delete(MovieEntry.buildFavoritesClearUri(),
-                        null,
-                        null);
-        Log.v(LOG_TAG, "Total entries deleted: " + deletedRows);
-
-        refreshMovies();
-    }
-
-    // Getters
-    @Override
-    public List<MovieClass> getPopularMovies() {
-        return mPopularMovies;
-    }
-
-    @Override
-    public List<MovieClass> getRatingMovies() {
-        return mRatingMovies;
-    }
-
-    @Override
-    public List<MovieClass> getFavoriteMovies() {
-        return mFavoriteMovies;
-    }
-
-    @Override
-    public MovieClass getMovieClass(int type, int position) {
-        switch (type) {
-            case MovieClass.TYPE_POPULAR: {
-                return mPopularMovies.get(position);
-            }
-
-            case MovieClass.TYPE_RATING: {
-                return mRatingMovies.get(position);
-            }
-
-            case MovieClass.TYPE_FAVORITE: {
-                return mFavoriteMovies.get(position);
-            }
-
-            default:
-                return null;
         }
     }
 

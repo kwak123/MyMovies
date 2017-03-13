@@ -1,6 +1,8 @@
 <resources>
     <string name="app_name">My Movies</string>
     <string name="detail_name">Details</string>
+    <string name="button_yes">Yes</string>
+    <string name="button_no">No</string>
 
     <!-- Provider -->
     <string name="content_authority">com.retroquack.kwak123.mymovies</string>
@@ -27,8 +29,11 @@
 
     <!-- Details strings -->
     <string name="favorite">Favorite</string>
+    <string name="add_favorite">Add to favorites?</string>
+    <string name="remove_favorite">Remove from favorites?</string>
     <string name="review_header">Reviews</string>
     <string name="trailer_header">Trailers</string>
+    <string name="splash_text">Select a movie</string>
     <string name="no_connection_string">Sorry, we couldn\'t load these results. Are you connected to the internet?</string>
     <string name="no_review">No reviews found!</string>
     <string name="no_trailer">No trailers found!</string>

@@ -1,11 +1,13 @@
 package com.retroquack.kwak123.mymovies.ui.activities;
 
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.app.FragmentManager;
 import android.support.v7.app.AppCompatActivity;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.FrameLayout;
 import android.widget.Toast;
 
 import com.retroquack.kwak123.mymovies.MyMoviesApp;
@@ -22,11 +24,12 @@ import javax.inject.Inject;
  * Holds the main fragment as well as the options menu for the main page.
  */
 
-public class MainActivity extends AppCompatActivity implements MainFragment.Callback {
+public class MainActivity extends AppCompatActivity implements MainFragment.MainCallback,
+        DetailsFragment.DetailsCallback {
 
     @Inject MovieRepository mMovieRepository;
 
-    private static final String DETAIL_TAG = "DF";
+    public static final String DETAIL_TAG = "DF";
     private boolean mTwoPane;
 
     @Override
@@ -35,16 +38,8 @@ public class MainActivity extends AppCompatActivity implements MainFragment.Call
 
         setContentView(R.layout.activity_main);
 
-        if (findViewById(R.id.movie_details_container) != null) {
-            mTwoPane = true;
-            if (savedInstanceState == null) {
-                getFragmentManager().beginTransaction()
-                        .replace(R.id.movie_details_container, new DetailsFragment(), DETAIL_TAG)
-                        .commit();
-            }
-        } else {
-            mTwoPane = false;
-        }
+        mTwoPane = (findViewById(R.id.movie_details_container) != null);
+
         ((MyMoviesApp) getApplication()).getAndroidComponent().inject(this);
     }
 
@@ -54,11 +49,32 @@ public class MainActivity extends AppCompatActivity implements MainFragment.Call
             Toast.makeText(this, R.string.no_movie, Toast.LENGTH_SHORT).show();
             return;
         }
-        Intent intent = new Intent(this, DetailsActivity.class);
-        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-        intent.putExtra(MovieClass.TYPE_KEY, type);
-        intent.putExtra(MovieClass.POSITION_KEY, position);
-        startActivity(intent);
+
+        if (mTwoPane) {
+            ((FrameLayout) findViewById(R.id.movie_details_container)).removeAllViews();
+            getFragmentManager().beginTransaction()
+                    .replace(R.id.movie_details_container,
+                            DetailsFragment.newInstance(type, position),
+                            DETAIL_TAG)
+                    .commit();
+        } else {
+            Intent intent = new Intent(this, DetailsActivity.class);
+            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+            intent.putExtra(MovieClass.TYPE_KEY, type);
+            intent.putExtra(MovieClass.POSITION_KEY, position);
+            startActivity(intent);
+        }
+    }
+
+    @Override
+    public void onDetailsClicked(String url) {
+        Intent intent = new Intent(Intent.ACTION_VIEW,
+                Uri.parse(url));
+        try {
+            startActivity(intent);
+        } catch (Exception ex) {
+            Toast.makeText(this, R.string.fail_connection, Toast.LENGTH_SHORT).show();
+        }
     }
 
     // Options
@@ -91,7 +107,5 @@ public class MainActivity extends AppCompatActivity implements MainFragment.Call
         AboutDialogFragment fragment = new AboutDialogFragment();
         fragment.show(fm, "about_fragment");
     }
-
-
 
 }

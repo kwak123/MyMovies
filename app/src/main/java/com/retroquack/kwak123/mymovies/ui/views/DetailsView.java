@@ -5,4 +5,5 @@ package com.retroquack.kwak123.mymovies.ui.views;
  */
 
 public interface DetailsView {
+    void onFavoritesChanged(boolean status);
 }

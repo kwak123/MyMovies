@@ -47,18 +47,15 @@ public class MainFragment extends Fragment implements
         LoaderManager.LoaderCallbacks<HashMap<String, List<MovieClass>>>,
         MainView {
 
-    // Various tags used throughout the activity, just to help keep things sane
     private static final String LOG_TAG = MainFragment.class.getSimpleName();
 
     private static final String SPINNER_KEY = "spinnerPosition";
-
-    // Instantiating some objects that will be used
     private MovieAdapter mAdapter;
     private Spinner mSpinner;
     private int spinnerPos;
     private int mMovieType;
     private MainPresenter mPresenter;
-    private Callback callback;
+    private MainCallback callback;
 
     private boolean hasStarted = false;
 
@@ -68,7 +65,7 @@ public class MainFragment extends Fragment implements
     public MainFragment() {
     }
 
-    public interface Callback {
+    public interface MainCallback {
         void onMovieClicked(int type, int position);
     }
 
@@ -78,7 +75,7 @@ public class MainFragment extends Fragment implements
         super.onAttach(context);
         ((MyMoviesApp) getActivity().getApplication())
                 .getAndroidComponent().inject(this);
-        callback = (Callback) getActivity();
+        callback = (MainCallback) getActivity();
     }
 
     @Override
@@ -139,6 +136,7 @@ public class MainFragment extends Fragment implements
 
     @Override
     public void refreshAdapter() {
+        mAdapter.clear();
         mAdapter.onFavoritesRefresh(mPresenter.onMoviesRequested(mMovieType));
     }
 
@@ -212,10 +210,7 @@ public class MainFragment extends Fragment implements
 
     public void onLoadFinished(Loader<HashMap<String, List<MovieClass>>> loader,
                                HashMap<String, List<MovieClass>> data) {
-        mAdapter.clear();
-
         mPresenter.onMoviesLoaded(data);
-        mAdapter.addAll(mPresenter.onMoviesRequested(mMovieType));
         //Log.v(LOG_TAG, "Loader is done loading: " + loader.getKey());
     }
 
