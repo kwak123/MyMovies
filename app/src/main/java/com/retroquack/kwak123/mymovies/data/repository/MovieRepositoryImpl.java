@@ -178,31 +178,26 @@ public class MovieRepositoryImpl implements MovieRepository {
                 null, null, null, null);
 
         List<MovieClass> moviesFavAssigned = new ArrayList<>();
+        List<String> keyList = new ArrayList<>();
 
         if (cursor != null && cursor.moveToFirst()) {
-            List<String> keyList = new ArrayList<>();
-
             do {
                 keyList.add(cursor.getString(0));
             } while (cursor.moveToNext());
+            cursor.close();
+        }
 
-            for (MovieClass movieClass : movieClasses) {
-                for (String key : keyList) {
-                    if (movieClass.getKey().equals(key)) {
-                        movieClass.setFavorited(true);
-                    }
+        for (MovieClass movieClass : movieClasses) {
+            movieClass.setFavorited(false);
+            for (String key : keyList) {
+                if (movieClass.getKey().equals(key)) {
+                    movieClass.setFavorited(true);
                 }
-                moviesFavAssigned.add(movieClass);
             }
-            cursor.close();
-            return moviesFavAssigned;
+            moviesFavAssigned.add(movieClass);
         }
 
-        if (cursor != null) {
-            cursor.close();
-        }
-
-        return movieClasses;
+        return moviesFavAssigned;
     }
 
     private void updateFavoriteMovies() {
