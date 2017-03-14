@@ -3,7 +3,6 @@ package com.retroquack.kwak123.mymovies.ui.presenter;
 import android.util.Log;
 
 import com.retroquack.kwak123.mymovies.data.repository.MovieRepository;
-import com.retroquack.kwak123.mymovies.data.repository.MovieRepositoryImpl;
 import com.retroquack.kwak123.mymovies.model.MovieClass;
 import com.retroquack.kwak123.mymovies.ui.views.MainView;
 

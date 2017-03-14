@@ -50,12 +50,17 @@ public class MainFragment extends Fragment implements
     private static final String LOG_TAG = MainFragment.class.getSimpleName();
 
     private static final String SPINNER_KEY = "spinnerPosition";
+    private static final String GRID_KEY = "gridPosition";
+
     private MovieAdapter mAdapter;
     private Spinner mSpinner;
     private int spinnerPos;
+    private int gridPos;
     private int mMovieType;
     private MainPresenter mPresenter;
     private MainCallback callback;
+
+    private GridView mGridView;
 
     private boolean hasStarted = false;
 
@@ -76,6 +81,7 @@ public class MainFragment extends Fragment implements
         ((MyMoviesApp) getActivity().getApplication())
                 .getAndroidComponent().inject(this);
         callback = (MainCallback) getActivity();
+        setRetainInstance(true);
     }
 
     @Override
@@ -87,6 +93,7 @@ public class MainFragment extends Fragment implements
 
         if (savedInstanceState != null) {
             spinnerPos = savedInstanceState.getInt(SPINNER_KEY);
+            gridPos = savedInstanceState.getInt(GRID_KEY);
             mMovieType = spinnerPos;
         } else {
             mMovieType = MovieRepositoryImpl.TYPE_POPULAR;
@@ -110,11 +117,15 @@ public class MainFragment extends Fragment implements
         View rootView = inflater.inflate(R.layout.fragment_main, container, false);
 
         //Loading GridView and GridAdapter
-        GridView mMovieGridView = (GridView) rootView.findViewById(R.id.grid_view);
+        mGridView = (GridView) rootView.findViewById(R.id.grid_view);
 
         mAdapter = new MovieAdapter(getActivity(), new ArrayList<MovieClass>());
-        mMovieGridView.setAdapter(mAdapter);
-        mMovieGridView.setOnItemClickListener(mOnClickListener);
+        mGridView.setAdapter(mAdapter);
+        mGridView.setOnItemClickListener(mOnClickListener);
+
+        if (gridPos != 0) {
+            mGridView.smoothScrollToPosition(gridPos);
+        }
 
         return rootView;
     }
@@ -123,7 +134,9 @@ public class MainFragment extends Fragment implements
     public void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
         mMovieType = mSpinner.getSelectedItemPosition();
+        gridPos = mGridView.getFirstVisiblePosition();
         outState.putInt(SPINNER_KEY, mMovieType);
+        outState.putInt(GRID_KEY, gridPos);
     }
 
     // Handle loading movie details
@@ -134,6 +147,7 @@ public class MainFragment extends Fragment implements
         }
     };
 
+    // MainView methods
     @Override
     public void refreshAdapter() {
         mAdapter.clear();

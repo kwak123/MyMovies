@@ -11,6 +11,7 @@ import android.widget.ImageView;
 import com.retroquack.kwak123.mymovies.R;
 import com.retroquack.kwak123.mymovies.model.MovieClass;
 import com.retroquack.kwak123.mymovies.tools.UrlTool;
+import com.retroquack.kwak123.mymovies.ui.activities.MainActivity;
 import com.squareup.picasso.Picasso;
 
 import java.util.List;
@@ -65,6 +66,10 @@ public class MovieAdapter extends ArrayAdapter<MovieClass> {
     }
 
     public void onFavoritesRefresh(List<MovieClass> movieClasses) {
+        if (movieClasses == null) {
+            ((MainActivity) getContext()).showSnackBar();
+            return;
+        }
         addAll(movieClasses);
         notifyDataSetChanged();
     }

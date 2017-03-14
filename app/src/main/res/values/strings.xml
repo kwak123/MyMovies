@@ -39,4 +39,8 @@
     <string name="no_trailer">No trailers found!</string>
     <string name="fail_connection">Failed to load video</string>
 
+    <!-- Error strings -->
+    <string name="error_data">Error fetching data</string>
+    <string name="error_network">No network connection</string>
+
 </resources>

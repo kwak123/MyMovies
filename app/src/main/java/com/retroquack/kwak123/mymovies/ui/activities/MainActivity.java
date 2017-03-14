@@ -1,9 +1,11 @@
 package com.retroquack.kwak123.mymovies.ui.activities;
 
 import android.content.Intent;
+import android.net.ConnectivityManager;
 import android.net.Uri;
 import android.os.Bundle;
 import android.app.FragmentManager;
+import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -20,6 +22,8 @@ import com.retroquack.kwak123.mymovies.ui.fragments.MainFragment;
 
 import javax.inject.Inject;
 
+import static android.support.design.widget.Snackbar.make;
+
 /**
  * Holds the main fragment as well as the options menu for the main page.
  */
@@ -31,10 +35,12 @@ public class MainActivity extends AppCompatActivity implements MainFragment.Main
 
     public static final String DETAIL_TAG = "DF";
     private boolean mTwoPane;
+    private ConnectivityManager mConnMan;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        mConnMan = (ConnectivityManager) getSystemService(CONNECTIVITY_SERVICE);
 
         setContentView(R.layout.activity_main);
 
@@ -75,6 +81,16 @@ public class MainActivity extends AppCompatActivity implements MainFragment.Main
         } catch (Exception ex) {
             Toast.makeText(this, R.string.fail_connection, Toast.LENGTH_SHORT).show();
         }
+    }
+
+    public void showSnackBar() {
+        Snackbar sb = Snackbar.make(findViewById(R.id.main_fragment),
+                getString(R.string.error_data), Snackbar.LENGTH_LONG);
+        sb.getView().setBackgroundColor(getResources().getColor(R.color.background_red));
+        if (mConnMan.getActiveNetworkInfo() == null) {
+            sb.setText(R.string.error_network);
+        }
+        sb.show();
     }
 
     // Options
