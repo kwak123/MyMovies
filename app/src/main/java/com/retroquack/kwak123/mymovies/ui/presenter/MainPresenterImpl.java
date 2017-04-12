@@ -9,12 +9,6 @@ import com.retroquack.kwak123.mymovies.ui.views.MainView;
 import java.util.HashMap;
 import java.util.List;
 
-/**
- * Blueprint for handling user events.
- *
- * Extra level of abstraction
- */
-
 public class MainPresenterImpl implements MainPresenter, MovieRepository.onChangeListener {
 
     private static final String LOG_TAG = MainPresenterImpl.class.getSimpleName();

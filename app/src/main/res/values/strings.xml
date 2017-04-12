@@ -37,7 +37,7 @@
     <string name="no_connection_string">Sorry, we couldn\'t load these results. Are you connected to the internet?</string>
     <string name="no_review">No reviews found!</string>
     <string name="no_trailer">No trailers found!</string>
-    <string name="fail_connection">Failed to load video</string>
+    <string name="fail_connection">Failed to load</string>
 
     <!-- Error strings -->
     <string name="error_data">Error fetching data</string>

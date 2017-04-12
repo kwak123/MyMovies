@@ -4,16 +4,25 @@ import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.widget.ImageView;
 import android.widget.Toast;
 
+import com.retroquack.kwak123.mymovies.MyMoviesApp;
 import com.retroquack.kwak123.mymovies.R;
+import com.retroquack.kwak123.mymovies.data.repository.MovieRepository;
 import com.retroquack.kwak123.mymovies.ui.fragments.DetailsFragment;
 import com.retroquack.kwak123.mymovies.model.MovieClass;
 
-/**
- * Receives intent, creates new fragments with parameters
- */
+import javax.inject.Inject;
+
+import butterknife.BindView;
+import butterknife.ButterKnife;
+
 public class DetailsActivity extends AppCompatActivity implements DetailsFragment.DetailsCallback{
+
+    @BindView(R.id.toolbar_backdrop_view) ImageView backdropView;
+
+    @Inject MovieRepository mMovieRepository;
 
     private static final String LOG_TAG = DetailsActivity.class.getSimpleName();
 
@@ -21,8 +30,9 @@ public class DetailsActivity extends AppCompatActivity implements DetailsFragmen
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_details);
+        ButterKnife.bind(this);
+        ((MyMoviesApp) getApplication()).getAndroidComponent().inject(this);
 
-        // Takes the MovieClass object from the intent and passes it into the DetailsFragment
         Intent intent = getIntent();
         int type = intent.getIntExtra(MovieClass.TYPE_KEY, -1);
         int position = intent.getIntExtra(MovieClass.POSITION_KEY, -1);

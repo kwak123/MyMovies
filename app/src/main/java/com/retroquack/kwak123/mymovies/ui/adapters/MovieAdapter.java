@@ -19,12 +19,6 @@ import java.util.List;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
-/**
- * Custom ArrayAdapter for binding images to the GridView. Progress bars removed for smoother UI.
- *
- * Added static ViewHolder class for AdapterView standards.
- */
-
 public class MovieAdapter extends ArrayAdapter<MovieClass> {
 
     public MovieAdapter(Context context, List<MovieClass> movieClasses) {
@@ -34,7 +28,6 @@ public class MovieAdapter extends ArrayAdapter<MovieClass> {
     @Override
     @NonNull
     public View getView(int position, View convertView, @NonNull ViewGroup parent) {
-
         ViewHolder holder;
 
         if (convertView != null) {

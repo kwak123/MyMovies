@@ -119,10 +119,7 @@ public class DetailsFragment extends Fragment implements
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-
-
         View rootView = inflater.inflate(R.layout.fragment_detail, container, false);
-
         unbinder = ButterKnife.bind(this, rootView);
 
         mMovieKey = mMovieClass.getKey();
@@ -140,12 +137,6 @@ public class DetailsFragment extends Fragment implements
                         View.GONE : View.VISIBLE);
                 detailMessageView.setText((!mMovieClass.getFavorite()) ?
                         R.string.add_favorite : R.string.remove_favorite);
-            }
-        });
-
-        favoriteCheckBox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-            @Override
-            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
             }
         });
 
